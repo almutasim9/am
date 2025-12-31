@@ -1,0 +1,43 @@
+// English-only translations - simplified
+export const translations = {
+    en: {
+        login: 'Login', username: 'Username', password: 'Password', dashboard: 'Dashboard',
+        tasks: 'Tasks', visits: 'Visits', archive: 'Archive', stores: 'Stores', settings: 'Settings',
+        totalStores: 'Total Stores', urgentVisits: 'Urgent Visits', pendingTasks: 'Pending Tasks',
+        newVisit: 'New Visit', newTask: 'New Task', upcomingVisits: 'Upcoming Visits',
+        urgentTasks: 'Urgent Tasks', search: 'Search...', filter: 'Filter', importExcel: 'Import Excel',
+        addStore: 'Add Store', name: 'Name', zone: 'Zone', category: 'Category', owner: 'Owner',
+        phone: 'Phone', status: 'Status', lastVisit: 'Last Visit', save: 'Save', cancel: 'Cancel',
+        delete: 'Delete', edit: 'Edit', complete: 'Complete', isEffective: 'Was this visit effective?',
+        createFollowUp: 'Create follow-up task', priority: 'Priority', high: 'High', medium: 'Medium',
+        low: 'Low', dueDate: 'Due Date', description: 'Description', visitType: 'Visit Type',
+        note: 'Note', storeHealth: 'Store Health', green: 'Healthy', amber: 'Needs Attention',
+        red: 'Urgent', active: 'Active', closed: 'Closed', scheduled: 'Scheduled', completed: 'Completed',
+        pending: 'Pending', done: 'Done', visitTypes: 'Visit Types', contactRoles: 'Contact Roles',
+        zones: 'Zones', storeCategories: 'Store Categories', taskCategories: 'Task Categories',
+        addNew: 'Add New', logout: 'Logout', loginError: 'Invalid credentials', savedSuccess: 'Saved successfully',
+        visitReason: 'Visit Reason', visitReasons: 'Visit Reasons',
+        savedSuccess: 'Saved successfully', deletedSuccess: 'Deleted successfully', importSuccess: 'Import successful', all: 'All',
+        noData: 'No data available', selectStore: 'Select Store', subTask: 'Sub Task',
+        importCSV: 'Import CSV/Excel', selectFile: 'Select File', preview: 'Preview',
+        importStores: 'Import Stores', duplicatesFound: 'duplicates found (will be skipped)',
+        newStores: 'new stores will be added', address: 'Address', mapLink: 'Map Link',
+        downloadTemplate: 'Download Template', importing: 'Importing...', areaName: 'Area Name',
+        confirmDelete: 'Confirm Delete', confirmDeleteMessage: 'Are you sure you want to delete this item?',
+        confirm: 'Confirm', loading: 'Loading...', call: 'Call', addVisitFor: 'Add Visit',
+        addTaskFor: 'Add Task', urgentStoresNeedVisit: 'Stores Need Urgent Visit', daysAgo: 'days ago',
+        neverVisited: 'Never visited', viewDetails: 'View Details', exportCSV: 'Export CSV',
+        storeDetails: 'Store Details', visitHistory: 'Visit History', relatedTasks: 'Related Tasks',
+        back: 'Back', noVisitsYet: 'No visits yet', noTasksYet: 'No tasks yet',
+        calendarView: 'Calendar View', listView: 'List View', exportSuccess: 'Export successful',
+        storesExported: 'stores exported', today: 'Today', thisWeek: 'This Week', thisMonth: 'This Month',
+        addContact: 'Add Contact', contactName: 'Contact Name', role: 'Role', cashier: 'Cashier',
+        accountant: 'Accountant', manager: 'Manager', deleteContact: 'Delete Contact',
+        showing: 'Showing', of: 'of', clearFilters: 'Clear Filters', viewProfile: 'View',
+        inProgress: 'In Progress',
+        analytics: 'Analytics',
+    },
+};
+
+// Keep 'ar' pointing to English for backwards compatibility
+translations.ar = translations.en;

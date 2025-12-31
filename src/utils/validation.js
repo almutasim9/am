@@ -1,0 +1,104 @@
+import { z } from 'zod';
+
+// Store validation schema
+export const storeSchema = z.object({
+    id: z.string()
+        .min(1, 'Store ID is required'),
+    name: z.string()
+        .min(2, 'Store name must be at least 2 characters')
+        .max(100, 'Store name is too long'),
+    zone: z.string().optional(),
+    category: z.string()
+        .min(1, 'Category is required'),
+    owner: z.string()
+        .min(2, 'Owner name is required')
+        .max(100, 'Owner name is too long'),
+    phone: z.string()
+        .min(1, 'Phone number is required')
+        .regex(/^[\+]?[0-9\s\-]{8,15}$/, 'Invalid phone number format'),
+    address: z.string().optional(),
+    area_name: z.string().optional(),
+    map_link: z.string().url('Invalid map link URL').optional().or(z.literal('')),
+    status: z.enum(['Active', 'Closed']).default('Active'),
+    pinned_note: z.string().max(500, 'Note is too long').optional(),
+    contacts: z.array(z.object({
+        name: z.string().optional(),
+        role: z.string().optional(),
+        phone: z.string().optional(),
+    })).optional(),
+});
+
+// Task validation schema
+export const taskSchema = z.object({
+    store_id: z.string()
+        .min(1, 'Please select a store'),
+    cat: z.string()
+        .min(1, 'Category is required'),
+    sub: z.string()
+        .min(1, 'Sub-task is required'),
+    priority: z.enum(['high', 'medium', 'low']).default('medium'),
+    due_date: z.string()
+        .min(1, 'Due date is required'),
+    description: z.string()
+        .max(1000, 'Description is too long')
+        .optional(),
+    status: z.enum(['pending', 'in_progress', 'done']).default('pending'),
+});
+
+// Visit validation schema
+export const visitSchema = z.object({
+    store_id: z.string()
+        .min(1, 'Please select a store'),
+    date: z.string()
+        .min(1, 'Date is required'),
+    type: z.string()
+        .min(1, 'Visit type is required'),
+    reason: z.string().optional(),
+    note: z.string()
+        .max(1000, 'Note is too long')
+        .optional(),
+    status: z.enum(['scheduled', 'completed']).default('scheduled'),
+    is_effective: z.boolean().nullable().optional(),
+});
+
+// Contact validation schema
+export const contactSchema = z.object({
+    name: z.string()
+        .min(2, 'Employee name is required'),
+    role: z.string()
+        .min(1, 'Role is required'),
+    phone: z.string()
+        .regex(/^[\+]?[0-9\s\-]{8,15}$/, 'Invalid phone number format'),
+});
+
+// Validation helper function
+export const validate = (schema, data) => {
+    try {
+        const result = schema.parse(data);
+        return { success: true, data: result, errors: null };
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            const errors = {};
+            error.errors.forEach(err => {
+                const path = err.path.join('.');
+                errors[path] = err.message;
+            });
+            return { success: false, data: null, errors };
+        }
+        throw error;
+    }
+};
+
+// Safe validation (doesn't throw)
+export const safeValidate = (schema, data) => {
+    const result = schema.safeParse(data);
+    if (result.success) {
+        return { success: true, data: result.data, errors: null };
+    }
+    const errors = {};
+    result.error.errors.forEach(err => {
+        const path = err.path.join('.');
+        errors[path] = err.message;
+    });
+    return { success: false, data: null, errors };
+};
