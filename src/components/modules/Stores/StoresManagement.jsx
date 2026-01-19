@@ -186,14 +186,39 @@ const StoresManagement = () => {
 
     const handleSave = async (storeData) => {
         const table = await db.from('stores');
-        if (editStore) {
-            await table.update(editStore.id, storeData);
-        } else {
-            await table.insert(storeData);
+
+        // Sanitize data
+        const { has_pos, has_sim_card, ...validData } = storeData;
+
+        // Fix for timestamp error: Convert empty string to null
+        if (validData.last_visit === '') {
+            validData.last_visit = null;
         }
+
+        let result;
+
+        if (editStore) {
+            result = await table.update(editStore.id, validData);
+        } else {
+            result = await table.insert(validData);
+        }
+
+        if (result.error) {
+            console.error('Save error:', result.error);
+            showToast(result.error.message || 'Error saving store', 'error');
+            return;
+        }
+
         showToast(t('savedSuccess'), 'success');
         setShowModal(false);
         setEditStore(null);
+
+        // Clear filters to ensure the new/updated store is visible
+        setSearch('');
+        setZoneFilter('');
+        setCatFilter('');
+        setHealthFilter('');
+
         onRefresh();
     };
 

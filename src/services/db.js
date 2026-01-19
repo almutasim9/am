@@ -27,38 +27,9 @@ const nextWeek = new Date(today); nextWeek.setDate(nextWeek.getDate() + 7);
 const lastWeek = new Date(today); lastWeek.setDate(lastWeek.getDate() - 7);
 
 export const initialData = {
-    stores: [
-        { id: '1', name: 'Al-Rasheed Market', zone: 'Baghdad Central', category: 'Grocery', owner: 'Ahmed Hassan', phone: '+964 770 123 4567', map_link: 'https://maps.google.com', status: 'Active', last_visit: today.toISOString(), pinned_note: 'VIP customer', contacts: [{ name: 'Ahmed', role: 'Owner', phone: '+964 770 123 4567' }], lat: 33.3128, lng: 44.3615 }, // Baghdad - Rasheed
-        { id: '2', name: 'Basra Electronics', zone: 'Basra', category: 'Electronics', owner: 'Mohammed Ali', phone: '+964 771 234 5678', map_link: 'https://maps.google.com', status: 'Active', last_visit: lastWeek.toISOString(), pinned_note: '', contacts: [{ name: 'Mohammed', role: 'Manager', phone: '+964 771 234 5678' }], lat: 30.5081, lng: 47.7835 }, // Basra
-        { id: '3', name: 'Erbil Fashion', zone: 'Erbil', category: 'Fashion', owner: 'Sara Ibrahim', phone: '+964 772 345 6789', map_link: 'https://maps.google.com', status: 'Active', last_visit: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(), pinned_note: 'Needs follow-up', contacts: [{ name: 'Sara', role: 'Owner', phone: '+964 772 345 6789' }], lat: 36.1901, lng: 44.0091 }, // Erbil
-        { id: '4', name: 'Mosul Pharmacy', zone: 'Mosul', category: 'Pharmacy', owner: 'Dr. Zaid', phone: '+964 773 456 7890', map_link: 'https://maps.google.com', status: 'Active', last_visit: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(), lat: 36.3489, lng: 43.1577 }, // Mosul
-        { id: '5', name: 'Karbala Sweets', zone: 'Karbala', category: 'Restaurant', owner: 'Hassan', phone: '+964 774 567 8901', map_link: 'https://maps.google.com', status: 'Active', last_visit: null, lat: 32.6160, lng: 44.0249 }, // Karbala
-    ],
-    visits: [
-        // Completed Visits (Past)
-        { id: '1', store_id: '1', date: lastWeek.toISOString(), type: 'Visit', note: 'Regular check-in', status: 'completed', is_effective: true },
-        { id: '2', store_id: '3', date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), type: 'Call', note: 'Discussed new collection', status: 'completed', is_effective: true },
-        { id: '3', store_id: '2', date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), type: 'Visit', note: 'Issue with delivery', status: 'completed', is_effective: false },
-
-        // Scheduled (Future)
-        { id: '4', store_id: '1', date: today.toISOString(), type: 'Visit', note: 'Discuss bulk order', status: 'scheduled', is_effective: null },
-        { id: '5', store_id: '4', date: tomorrow.toISOString(), type: 'Visit', note: 'New product introduction', status: 'scheduled', is_effective: null },
-        { id: '6', store_id: '5', date: nextWeek.toISOString(), type: 'Meeting', note: 'Sign contract', status: 'scheduled', is_effective: null },
-        { id: '7', store_id: '2', date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), type: 'Call', note: 'Follow up payment', status: 'scheduled', is_effective: null },
-    ],
-    tasks: [
-        // Pending High Priority
-        { id: '1', store_id: '1', cat: 'Sales', sub: 'Finalize Deal', status: 'pending', priority: 'high', due_date: today.toISOString(), description: 'Close the bulk deal for Q1' },
-        { id: '2', store_id: '4', cat: 'Support', sub: 'Urgent Delivery', status: 'pending', priority: 'high', due_date: tomorrow.toISOString(), description: 'Ensure delivery arrives by morning' },
-
-        // Pending Normal
-        { id: '3', store_id: '2', cat: 'Support', sub: 'Fix Display', status: 'pending', priority: 'medium', due_date: nextWeek.toISOString(), description: 'Help arrange the new stand' },
-        { id: '4', store_id: '3', cat: 'Sales', sub: 'Send Catalog', status: 'pending', priority: 'low', due_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), description: 'Email the PDF catalog' },
-
-        // In Progress & Done
-        { id: '5', store_id: '5', cat: 'Admin', sub: 'Update Contract', status: 'in_progress', priority: 'medium', due_date: tomorrow.toISOString(), description: 'Updating terms' },
-        { id: '6', store_id: '1', cat: 'Sales', sub: 'Initial Contact', status: 'done', priority: 'medium', due_date: lastWeek.toISOString(), description: 'First meeting done' },
-    ],
+    stores: [],
+    visits: [],
+    tasks: [],
     sales_snapshots: [],
     settings: {
         visitTypes: ['Visit', 'Call', 'Meeting'],

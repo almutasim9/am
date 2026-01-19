@@ -7,7 +7,7 @@ export const storeSchema = z.object({
     name: z.string()
         .min(2, 'Store name must be at least 2 characters')
         .max(100, 'Store name is too long'),
-    zone: z.string().optional(),
+    zone: z.string().min(1, 'Zone is required'),
     category: z.string()
         .min(1, 'Category is required'),
     owner: z.string()
@@ -15,7 +15,7 @@ export const storeSchema = z.object({
         .max(100, 'Owner name is too long'),
     phone: z.string()
         .min(1, 'Phone number is required')
-        .regex(/^[\+]?[0-9\s\-]{8,15}$/, 'Invalid phone number format'),
+        .min(5, 'Phone number must be at least 5 digits'),
     address: z.string().optional(),
     area_name: z.string().optional(),
     map_link: z.string().url('Invalid map link URL').optional().or(z.literal('')),

@@ -70,7 +70,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
         if (!validation.success) {
             setErrors(validation.errors);
             // Switch to section with errors
-            if (validation.errors.name || validation.errors.category || validation.errors.status) {
+            if (validation.errors.id || validation.errors.name || validation.errors.category || validation.errors.status) {
                 setActiveSection('basic');
             } else if (validation.errors.zone || validation.errors.address) {
                 setActiveSection('location');
@@ -138,7 +138,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                     {/* Store ID */}
                     <div>
                         <label className="block text-sm font-medium dark:text-slate-300 mb-1">
-                            ID {store ? '' : <span className="text-xs text-slate-400">(Optional)</span>}
+                            ID <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
@@ -148,11 +148,11 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                             disabled={!!store} // Disable if editing existing store
                             dir="ltr"
                             className={`w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white ${store ? 'bg-slate-100 dark:bg-slate-600 cursor-not-allowed' : ''
-                                }`}
+                                } ${errors.id ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
                         />
-                        {!store && (
-                            <p className="text-xs text-slate-400 mt-1">
-                                Leave empty to auto-generate ID
+                        {errors.id && (
+                            <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                <AlertCircle size={12} /> {errors.id}
                             </p>
                         )}
                     </div>
@@ -363,7 +363,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                         <div>
                             <label className="block text-sm font-medium dark:text-slate-300 mb-1">
                                 <PhoneIcon size={14} className="inline mr-1" />
-                                {t('phone')}
+                                {t('phone')} <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="tel"
