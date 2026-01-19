@@ -6,7 +6,7 @@ import useTranslation from '../../../hooks/useTranslation';
 import { DataContext } from '../../../contexts/DataContext';
 import { getStoreHealth } from '../../../utils/helpers';
 import PageTransition from '../../common/PageTransition';
-import { SkeletonStats } from '../../common/Skeleton';
+import { DashboardStatsSkeleton } from '../../common/Skeleton';
 
 const Analytics = () => {
     const { stores, visits, tasks, isLoading } = useContext(DataContext);
@@ -73,8 +73,8 @@ const Analytics = () => {
             <PageTransition>
                 <div className="space-y-6">
                     <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" />
-                    <SkeletonStats />
-                    <SkeletonStats />
+                    <DashboardStatsSkeleton />
+                    <DashboardStatsSkeleton />
                 </div>
             </PageTransition>
         );

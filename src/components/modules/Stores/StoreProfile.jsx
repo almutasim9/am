@@ -146,15 +146,15 @@ const StoreProfile = ({ store, onBack, onEdit, onUpdateStore }) => {
                         <div>
                             <div className="flex items-center gap-3 mb-2">
                                 <h1 className="text-2xl font-bold dark:text-white">{store.name}</h1>
-                                {store.id && (
+                                {store.store_code && (
                                     <div
-                                        className="flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs font-mono cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-                                        onClick={() => copyToClipboard(store.id)}
-                                        title="Click to copy ID"
+                                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm font-mono cursor-pointer hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-200 dark:border-emerald-800"
+                                        onClick={() => copyToClipboard(store.store_code)}
+                                        title="Click to copy Store Code"
                                     >
-                                        <Hash size={12} />
-                                        <span>{store.id}</span>
-                                        <Copy size={10} className="ml-1 opacity-50" />
+                                        <Hash size={14} />
+                                        <span className="font-bold">{store.store_code}</span>
+                                        <Copy size={12} className="ml-1 opacity-60" />
                                     </div>
                                 )}
                             </div>

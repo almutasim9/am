@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, CheckSquare, Calendar, Archive, Store, Settings, Sun, Moon, LogOut, BarChart3, FileBarChart, Map } from 'lucide-react';
+import { Home, CheckSquare, Calendar, Archive, Store, Settings, Sun, Moon, LogOut, BarChart3, FileBarChart, Map, UtensilsCrossed } from 'lucide-react';
 import useTranslation from '../../hooks/useTranslation';
 import { AuthContext, ThemeContext } from '../../contexts/AppContext';
 
@@ -17,7 +17,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
         { path: '/stores', icon: Store, label: t('stores') },
         { path: '/map', icon: Map, label: t('map') || 'Map' },
         { path: '/analytics', icon: BarChart3, label: t('analytics') || 'Analytics' },
-
+        { path: '/menu-builder', icon: UtensilsCrossed, label: t('menuBuilder') || 'Menu Builder' },
         { path: '/settings', icon: Settings, label: t('settings') },
     ];
 

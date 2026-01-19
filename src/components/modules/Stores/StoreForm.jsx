@@ -8,6 +8,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
     const t = useTranslation();
     const { lang } = useContext(LangContext);
     const [form, setForm] = useState(store || {
+        store_code: '', // كود المتجر الظاهر للمستخدم
         name: '',
         zone: '',
         area_name: '',
@@ -70,7 +71,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
         if (!validation.success) {
             setErrors(validation.errors);
             // Switch to section with errors
-            if (validation.errors.id || validation.errors.name || validation.errors.category || validation.errors.status) {
+            if (validation.errors.store_code || validation.errors.name || validation.errors.category || validation.errors.status) {
                 setActiveSection('basic');
             } else if (validation.errors.zone || validation.errors.address) {
                 setActiveSection('location');
@@ -135,26 +136,33 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
             {/* Basic Info Section */}
             {activeSection === 'basic' && (
                 <div className="space-y-4 animate-fadeIn">
-                    {/* Store ID */}
+                    {/* Store Code - كود المتجر */}
                     <div>
                         <label className="block text-sm font-medium dark:text-slate-300 mb-1">
-                            ID <span className="text-red-500">*</span>
+                            Store Code <span className="text-red-500">*</span>
+                            <span className="text-xs text-slate-400 ml-2">(5 أرقام)</span>
                         </label>
                         <input
                             type="text"
-                            value={form.id || ''}
-                            onChange={e => handleFieldChange('id', e.target.value)}
-                            placeholder="Unique store ID (e.g., STR-001)"
-                            disabled={!!store} // Disable if editing existing store
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            maxLength={5}
+                            value={form.store_code || ''}
+                            onChange={e => {
+                                // Allow only numbers
+                                const value = e.target.value.replace(/\D/g, '');
+                                handleFieldChange('store_code', value);
+                            }}
+                            placeholder="12345"
                             dir="ltr"
-                            className={`w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white ${store ? 'bg-slate-100 dark:bg-slate-600 cursor-not-allowed' : ''
-                                } ${errors.id ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
+                            className={`w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white font-mono text-lg tracking-widest ${errors.store_code ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
                         />
-                        {errors.id && (
+                        {errors.store_code && (
                             <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                                <AlertCircle size={12} /> {errors.id}
+                                <AlertCircle size={12} /> {errors.store_code}
                             </p>
                         )}
+                        <p className="text-slate-400 text-xs mt-1">💡 كود فريد مكون من 5 أرقام</p>
                     </div>
 
                     {/* Store Name */}
@@ -271,25 +279,39 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                                 )}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium dark:text-slate-300 mb-1">{t('areaName')}</label>
+                                <label className="block text-sm font-medium dark:text-slate-300 mb-1">
+                                    {t('areaName')} <span className="text-red-500">*</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={form.area_name || ''}
                                     onChange={e => handleFieldChange('area_name', e.target.value)}
-                                    placeholder="Sub-area name"
-                                    className="w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white"
+                                    placeholder="اسم المنطقة"
+                                    className={`w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white ${errors.area_name ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
                                 />
+                                {errors.area_name && (
+                                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                        <AlertCircle size={12} /> {errors.area_name}
+                                    </p>
+                                )}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium dark:text-slate-300 mb-1">{t('address')}</label>
+                            <label className="block text-sm font-medium dark:text-slate-300 mb-1">
+                                {t('address')} <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 type="text"
                                 value={form.address || ''}
                                 onChange={e => handleFieldChange('address', e.target.value)}
-                                placeholder="Detailed address"
-                                className="w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white"
+                                placeholder="العنوان التفصيلي"
+                                className={`w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white ${errors.address ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
                             />
+                            {errors.address && (
+                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                    <AlertCircle size={12} /> {errors.address}
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium dark:text-slate-300 mb-1">

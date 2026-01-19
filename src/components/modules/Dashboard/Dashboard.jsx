@@ -7,7 +7,7 @@ import { DataContext } from '../../../contexts/DataContext';
 import { AuthContext, LangContext } from '../../../contexts/AppContext';
 import { getStoreHealth, formatDate, priorityColors } from '../../../utils/helpers';
 import PageTransition from '../../common/PageTransition';
-import { SkeletonStats, SkeletonCard } from '../../common/Skeleton';
+import { DashboardStatsSkeleton, CardSkeleton } from '../../common/Skeleton';
 
 // Animation variants
 const containerVariants = {
@@ -79,10 +79,10 @@ const Dashboard = () => {
             <PageTransition>
                 <div className="space-y-4">
                     <div className="h-16 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" />
-                    <SkeletonStats />
+                    <DashboardStatsSkeleton />
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <SkeletonCard />
-                        <SkeletonCard />
+                        <CardSkeleton />
+                        <CardSkeleton />
                     </div>
                 </div>
             </PageTransition>

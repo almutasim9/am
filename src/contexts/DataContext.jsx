@@ -10,6 +10,9 @@ export const queryKeys = {
     visits: ['visits'],
     tasks: ['tasks'],
     settings: ['settings'],
+    menus: ['menus'],
+    menuCategories: ['menu_categories'],
+    menuItems: ['menu_items'],
 };
 
 // Stale time: how long data is considered fresh (5 minutes)
@@ -50,6 +53,36 @@ const fetchSettings = async () => {
     return await db.getSettings();
 };
 
+const fetchMenus = async () => {
+    const table = await db.from('menus');
+    const { data, error } = await table.select();
+    if (error) {
+        console.error('Error fetching menus:', error);
+        throw new Error(error.message || 'Failed to fetch menus');
+    }
+    return data || [];
+};
+
+const fetchMenuCategories = async () => {
+    const table = await db.from('menu_categories');
+    const { data, error } = await table.select();
+    if (error) {
+        console.error('Error fetching menu categories:', error);
+        throw new Error(error.message || 'Failed to fetch menu categories');
+    }
+    return data || [];
+};
+
+const fetchMenuItems = async () => {
+    const table = await db.from('menu_items');
+    const { data, error } = await table.select();
+    if (error) {
+        console.error('Error fetching menu items:', error);
+        throw new Error(error.message || 'Failed to fetch menu items');
+    }
+    return data || [];
+};
+
 export const DataProvider = ({ children }) => {
     const queryClient = useQueryClient();
 
@@ -78,6 +111,24 @@ export const DataProvider = ({ children }) => {
         staleTime: STALE_TIME * 2, // Settings change less frequently
     });
 
+    const menusQuery = useQuery({
+        queryKey: queryKeys.menus,
+        queryFn: fetchMenus,
+        staleTime: STALE_TIME,
+    });
+
+    const menuCategoriesQuery = useQuery({
+        queryKey: queryKeys.menuCategories,
+        queryFn: fetchMenuCategories,
+        staleTime: STALE_TIME,
+    });
+
+    const menuItemsQuery = useQuery({
+        queryKey: queryKeys.menuItems,
+        queryFn: fetchMenuItems,
+        staleTime: STALE_TIME,
+    });
+
     // Optimistic update helper for stores
     const setStores = (updater) => {
         queryClient.setQueryData(queryKeys.stores, (old) =>
@@ -103,6 +154,24 @@ export const DataProvider = ({ children }) => {
         );
     };
 
+    const setMenus = (updater) => {
+        queryClient.setQueryData(queryKeys.menus, (old) =>
+            typeof updater === 'function' ? updater(old) : updater
+        );
+    };
+
+    const setMenuCategories = (updater) => {
+        queryClient.setQueryData(queryKeys.menuCategories, (old) =>
+            typeof updater === 'function' ? updater(old) : updater
+        );
+    };
+
+    const setMenuItems = (updater) => {
+        queryClient.setQueryData(queryKeys.menuItems, (old) =>
+            typeof updater === 'function' ? updater(old) : updater
+        );
+    };
+
     // Refresh all data (invalidate cache)
     const refreshData = (showLoading = false) => {
         if (showLoading) {
@@ -112,6 +181,9 @@ export const DataProvider = ({ children }) => {
                 queryClient.invalidateQueries({ queryKey: queryKeys.visits }),
                 queryClient.invalidateQueries({ queryKey: queryKeys.tasks }),
                 queryClient.invalidateQueries({ queryKey: queryKeys.settings }),
+                queryClient.invalidateQueries({ queryKey: queryKeys.menus }),
+                queryClient.invalidateQueries({ queryKey: queryKeys.menuCategories }),
+                queryClient.invalidateQueries({ queryKey: queryKeys.menuItems }),
             ]);
         } else {
             // Just refetch in background
@@ -124,7 +196,7 @@ export const DataProvider = ({ children }) => {
 
     // Combined loading state
     const isLoading = storesQuery.isLoading || visitsQuery.isLoading ||
-        tasksQuery.isLoading || settingsQuery.isLoading;
+        tasksQuery.isLoading || settingsQuery.isLoading || menusQuery.isLoading;
 
     // Combined error state
     const error = storesQuery.error || visitsQuery.error ||
@@ -137,6 +209,9 @@ export const DataProvider = ({ children }) => {
             visits: visitsQuery.data || [],
             tasks: tasksQuery.data || [],
             settings: settingsQuery.data || {},
+            menus: menusQuery.data || [],
+            menuCategories: menuCategoriesQuery.data || [],
+            menuItems: menuItemsQuery.data || [],
 
             // Loading & Error states
             isLoading,
@@ -147,6 +222,9 @@ export const DataProvider = ({ children }) => {
             setVisits,
             setTasks,
             setSettings,
+            setMenus,
+            setMenuCategories,
+            setMenuItems,
 
             // Refresh function
             refreshData,

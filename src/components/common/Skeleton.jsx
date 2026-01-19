@@ -1,116 +1,122 @@
 import React from 'react';
 
-// Base skeleton component
-const SkeletonBase = ({ className = '', animate = true }) => (
-    <div className={`bg-slate-200/70 dark:bg-slate-700/50 backdrop-blur-sm rounded ${animate ? 'animate-pulse' : ''} ${className}`} />
+// Skeleton Base Component
+const SkeletonPulse = ({ className = '' }) => (
+    <div className={`animate-pulse bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700 bg-[length:200%_100%] rounded ${className}`}
+        style={{ animation: 'shimmer 1.5s infinite linear' }} />
 );
 
-// Text line skeleton
-export const SkeletonText = ({ width = 'w-full', height = 'h-4' }) => (
-    <SkeletonBase className={`${width} ${height}`} />
-);
-
-// Circle skeleton (for avatars)
-export const SkeletonCircle = ({ size = 'w-10 h-10' }) => (
-    <SkeletonBase className={`${size} rounded-full`} />
-);
-
-// Card skeleton
-export const SkeletonCard = () => (
-    <div className="glass-card p-6 rounded-3xl">
-        <div className="flex items-center gap-4 mb-4">
-            <SkeletonCircle />
-            <div className="flex-1 space-y-2">
-                <SkeletonText width="w-3/4" />
-                <SkeletonText width="w-1/2" height="h-3" />
-            </div>
-        </div>
-        <div className="space-y-3">
-            <SkeletonText />
-            <SkeletonText width="w-5/6" />
-            <SkeletonText width="w-4/6" />
-        </div>
-    </div>
-);
-
-// Store card skeleton
-export const SkeletonStoreCard = () => (
-    <div className="glass-card rounded-3xl overflow-hidden">
-        <SkeletonBase className="h-2 w-full" animate={false} />
+// Card Skeleton
+export const CardSkeleton = ({ hasImage = false }) => (
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden">
+        {hasImage && <SkeletonPulse className="h-40 w-full rounded-none" />}
         <div className="p-5 space-y-4">
-            <div className="flex items-start justify-between">
-                <div className="space-y-2 flex-1">
-                    <SkeletonText width="w-3/4" height="h-5" />
-                    <SkeletonText width="w-1/2" height="h-3" />
-                </div>
-                <SkeletonBase className="w-16 h-6 rounded-lg" />
-            </div>
+            <SkeletonPulse className="h-6 w-3/4" />
+            <SkeletonPulse className="h-4 w-1/2" />
             <div className="flex gap-2">
-                <SkeletonBase className="w-20 h-8 rounded-lg" />
-                <SkeletonBase className="w-20 h-8 rounded-lg" />
-                <SkeletonBase className="w-20 h-8 rounded-lg" />
+                <SkeletonPulse className="h-8 w-20" />
+                <SkeletonPulse className="h-8 w-20" />
             </div>
         </div>
     </div>
 );
 
-// Task card skeleton
-export const SkeletonTaskCard = () => (
-    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg">
-        <div className="flex items-center gap-3 mb-3">
-            <SkeletonBase className="w-1 h-12 rounded-full" />
-            <div className="flex-1 space-y-2">
-                <SkeletonText width="w-4/5" height="h-4" />
-                <SkeletonText width="w-2/3" height="h-3" />
+// Store Card Skeleton
+export const StoreCardSkeleton = () => (
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden">
+        <SkeletonPulse className="h-1.5 w-full rounded-none" />
+        <div className="p-5 space-y-4">
+            <div className="flex justify-between">
+                <div className="space-y-2 flex-1">
+                    <SkeletonPulse className="h-5 w-3/4" />
+                    <SkeletonPulse className="h-4 w-1/2" />
+                </div>
+                <SkeletonPulse className="h-6 w-16 rounded-full" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+                <SkeletonPulse className="h-16 rounded-xl" />
+                <SkeletonPulse className="h-16 rounded-xl" />
+            </div>
+            <div className="flex gap-2 pt-3 border-t dark:border-slate-700">
+                <SkeletonPulse className="h-10 w-10 rounded-xl" />
+                <SkeletonPulse className="h-10 flex-1 rounded-xl" />
+                <SkeletonPulse className="h-10 w-10 rounded-xl" />
             </div>
         </div>
+    </div>
+);
+
+// Task Card Skeleton
+export const TaskCardSkeleton = () => (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border-l-4 border-slate-300 dark:border-slate-600">
+        <div className="flex justify-between items-start mb-3">
+            <SkeletonPulse className="h-5 w-3/4" />
+            <SkeletonPulse className="h-5 w-16 rounded-full" />
+        </div>
+        <SkeletonPulse className="h-4 w-1/2 mb-3" />
         <div className="flex justify-between items-center">
-            <SkeletonText width="w-24" height="h-5" />
-            <SkeletonBase className="w-16 h-6 rounded-lg" />
+            <SkeletonPulse className="h-4 w-24" />
+            <SkeletonPulse className="h-8 w-8 rounded-lg" />
         </div>
     </div>
 );
 
-// Stats card skeleton
-export const SkeletonStats = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[1, 2, 3].map(i => (
-            <div key={i} className="bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 rounded-2xl p-6 animate-pulse">
-                <SkeletonBase className="w-8 h-8 rounded-lg mb-2" animate={false} />
-                <SkeletonBase className="w-16 h-8 mb-1" animate={false} />
-                <SkeletonBase className="w-24 h-4" animate={false} />
+// Visit Card Skeleton
+export const VisitCardSkeleton = () => (
+    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm">
+        <div className="flex gap-4">
+            <SkeletonPulse className="w-14 h-14 rounded-xl flex-shrink-0" />
+            <div className="flex-1 space-y-2">
+                <SkeletonPulse className="h-5 w-3/4" />
+                <SkeletonPulse className="h-4 w-1/2" />
+                <div className="flex gap-2">
+                    <SkeletonPulse className="h-6 w-16 rounded-full" />
+                    <SkeletonPulse className="h-6 w-20 rounded-full" />
+                </div>
             </div>
-        ))}
+        </div>
     </div>
 );
 
-// Table row skeleton
-export const SkeletonTableRow = () => (
-    <div className="flex items-center gap-4 p-4 border-b dark:border-slate-700">
-        <SkeletonCircle size="w-8 h-8" />
-        <SkeletonText width="w-1/4" />
-        <SkeletonText width="w-1/5" />
-        <SkeletonText width="w-1/6" />
-        <SkeletonBase className="w-20 h-6 rounded-lg" />
+// Stats Card Skeleton
+export const StatsCardSkeleton = () => (
+    <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg">
+        <div className="flex items-center justify-between mb-4">
+            <SkeletonPulse className="h-10 w-10 rounded-xl" />
+            <SkeletonPulse className="h-6 w-16 rounded-full" />
+        </div>
+        <SkeletonPulse className="h-8 w-24 mb-2" />
+        <SkeletonPulse className="h-4 w-32" />
     </div>
 );
 
-// Generic list skeleton
-export const SkeletonList = ({ count = 5, ItemComponent = SkeletonCard }) => (
-    <div className="space-y-4">
-        {Array.from({ length: count }).map((_, i) => (
-            <ItemComponent key={i} />
-        ))}
+// Dashboard Stats Grid Skeleton
+export const DashboardStatsSkeleton = () => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array(4).fill(0).map((_, i) => <StatsCardSkeleton key={i} />)}
     </div>
 );
 
-// Grid skeleton
-export const SkeletonGrid = ({ count = 6, ItemComponent = SkeletonStoreCard, cols = 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' }) => (
-    <div className={`grid ${cols} gap-4`}>
-        {Array.from({ length: count }).map((_, i) => (
-            <ItemComponent key={i} />
-        ))}
+// Grid Skeleton
+export const GridSkeleton = ({ count = 6, CardComponent = StoreCardSkeleton }) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array(count).fill(0).map((_, i) => <CardComponent key={i} />)}
     </div>
 );
 
-export default SkeletonBase;
+// CSS for shimmer animation
+const shimmerKeyframes = `
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+`;
+
+if (typeof document !== 'undefined' && !document.getElementById('skeleton-styles')) {
+    const style = document.createElement('style');
+    style.id = 'skeleton-styles';
+    style.textContent = shimmerKeyframes;
+    document.head.appendChild(style);
+}
+
+export default SkeletonPulse;

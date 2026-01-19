@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Plus, Calendar, Edit2, Trash2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Plus, Calendar, Edit2, Trash2, ChevronRight, ChevronLeft, Search, Download, MapPin, Clock, CheckCircle2, TrendingUp, AlertTriangle } from 'lucide-react';
 import useTranslation from '../../../hooks/useTranslation';
 import { ToastContext } from '../../../contexts/AppContext';
 import { DataContext } from '../../../contexts/DataContext';
@@ -10,6 +10,7 @@ import Modal from '../../common/Modal';
 import VisitForm from './VisitForm';
 import CompleteVisitForm from './CompleteVisitForm';
 import PageTransition from '../../common/PageTransition';
+import * as XLSX from 'xlsx';
 
 const VisitsList = () => {
     const { visits, stores, settings, refreshData: onRefresh } = useContext(DataContext);
@@ -25,6 +26,86 @@ const VisitsList = () => {
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Statistics
+    const stats = useMemo(() => {
+        const now = new Date();
+        const todayStr = now.toDateString();
+        const completedVisits = visits.filter(v => v.status === 'completed');
+        const effectiveVisits = completedVisits.filter(v => v.is_effective);
+
+        return {
+            total: visits.length,
+            scheduled: visits.filter(v => v.status === 'scheduled').length,
+            completed: completedVisits.length,
+            today: visits.filter(v => v.date && new Date(v.date).toDateString() === todayStr).length,
+            overdue: visits.filter(v => {
+                if (!v.date || v.status === 'completed') return false;
+                const visitDate = new Date(v.date);
+                return visitDate < now && visitDate.toDateString() !== todayStr;
+            }).length,
+            effectiveRate: completedVisits.length > 0
+                ? Math.round((effectiveVisits.length / completedVisits.length) * 100)
+                : 0
+        };
+    }, [visits]);
+
+    // Search filter function
+    const matchesSearch = (visit) => {
+        if (!searchQuery.trim()) return true;
+        const store = stores.find(s => s.id === visit.store_id);
+        const query = searchQuery.toLowerCase();
+        return (
+            store?.name?.toLowerCase().includes(query) ||
+            visit.type?.toLowerCase().includes(query) ||
+            visit.reason?.toLowerCase().includes(query) ||
+            visit.note?.toLowerCase().includes(query)
+        );
+    };
+
+    // Export to Excel
+    const handleExportVisits = () => {
+        const exportData = visits.map(visit => {
+            const store = stores.find(s => s.id === visit.store_id);
+            return {
+                'Store': store?.name || '-',
+                'Date': visit.date ? formatDate(visit.date) : '-',
+                'Type': visit.type || '-',
+                'Reason': visit.reason || '-',
+                'Status': visit.status || 'scheduled',
+                'Effective': visit.is_effective ? 'Yes' : (visit.is_effective === false ? 'No' : '-'),
+                'Note': visit.note || '-'
+            };
+        });
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Visits');
+
+        ws['!cols'] = [
+            { wch: 25 }, // Store
+            { wch: 15 }, // Date
+            { wch: 12 }, // Type
+            { wch: 15 }, // Reason
+            { wch: 12 }, // Status
+            { wch: 10 }, // Effective
+            { wch: 40 }  // Note
+        ];
+
+        XLSX.writeFile(wb, `visits_${new Date().toISOString().split('T')[0]}.xlsx`);
+        showToast('Visits exported successfully!', 'success');
+    };
+
+    // Open map link
+    const openMapLink = (storeId) => {
+        const store = stores.find(s => s.id === storeId);
+        if (store?.map_link) {
+            window.open(store.map_link, '_blank');
+        } else {
+            showToast('No map link available for this store', 'warning');
+        }
+    };
 
     // Counts
     const scheduledCount = visits.filter(v => v.status === 'scheduled').length;
@@ -36,6 +117,9 @@ const VisitsList = () => {
         if (storeFilter) {
             filtered = filtered.filter(v => v.store_id === storeFilter);
         }
+        // Apply search filter
+        filtered = filtered.filter(matchesSearch);
+
         return filtered.sort((a, b) => {
             if (activeTab === 'scheduled') {
                 return new Date(a.date) - new Date(b.date);
@@ -94,36 +178,69 @@ const VisitsList = () => {
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     const handleSave = async (visitData) => {
-        const table = await db.from('visits');
-        if (editVisit) {
-            await table.update(editVisit.id, visitData);
-        } else {
-            await table.insert(visitData);
+        try {
+            const table = await db.from('visits');
+            if (editVisit) {
+                const { error } = await table.update(editVisit.id, visitData);
+                if (error) {
+                    showToast(error.userMessage || 'Error updating visit. Check Supabase RLS settings.', 'error');
+                    console.error('Update error:', error);
+                    return;
+                }
+            } else {
+                const { data, error } = await table.insert(visitData);
+                if (error) {
+                    showToast(error.userMessage || 'Error creating visit. Check Supabase RLS settings.', 'error');
+                    console.error('Insert error:', error);
+                    return;
+                }
+            }
+            showToast(t('savedSuccess'), 'success');
+            setShowModal(false);
+            setEditVisit(null);
+            onRefresh();
+        } catch (err) {
+            console.error('handleSave error:', err);
+            showToast(err.userMessage || 'Unexpected error. Please try again.', 'error');
         }
-        showToast(t('savedSuccess'), 'success');
-        setShowModal(false);
-        setEditVisit(null);
-        onRefresh();
     };
 
     const handleComplete = async (visit, isEffective, createFollowUp) => {
-        const table = await db.from('visits');
-        await table.update(visit.id, { status: 'completed', is_effective: isEffective });
-        if (isEffective) {
-            const storesTable = await db.from('stores');
-            await storesTable.update(visit.store_id, { last_visit: new Date().toISOString() });
+        try {
+            const table = await db.from('visits');
+            const { error } = await table.update(visit.id, { status: 'completed', is_effective: isEffective });
+            if (error) {
+                showToast(error.userMessage || 'Error completing visit.', 'error');
+                return;
+            }
+            if (isEffective) {
+                const storesTable = await db.from('stores');
+                await storesTable.update(visit.store_id, { last_visit: new Date().toISOString() });
+            }
+            showToast(t('savedSuccess'), 'success');
+            setShowComplete(null);
+            onRefresh();
+            if (createFollowUp) onCreateTask(visit.store_id);
+        } catch (err) {
+            console.error('handleComplete error:', err);
+            showToast('Error completing visit.', 'error');
         }
-        showToast(t('savedSuccess'), 'success');
-        setShowComplete(null);
-        onRefresh();
-        if (createFollowUp) onCreateTask(visit.store_id);
     };
 
     const handleDelete = async (visitId) => {
-        const table = await db.from('visits');
-        await table.delete(visitId);
-        showToast(t('deletedSuccess'), 'success');
-        onRefresh();
+        try {
+            const table = await db.from('visits');
+            const { error } = await table.delete(visitId);
+            if (error) {
+                showToast(error.userMessage || 'Error deleting visit.', 'error');
+                return;
+            }
+            showToast(t('deletedSuccess'), 'success');
+            onRefresh();
+        } catch (err) {
+            console.error('handleDelete error:', err);
+            showToast('Error deleting visit.', 'error');
+        }
     };
 
     return (
@@ -152,6 +269,83 @@ const VisitsList = () => {
                             <Plus size={20} /><span className="hidden sm:inline">{t('newVisit')}</span><span className="sm:hidden">Add</span>
                         </button>
                     </div>
+                </div>
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                                <Calendar size={20} className="text-blue-600" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold dark:text-white">{stats.total}</p>
+                                <p className="text-xs text-slate-500">Total Visits</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                                <Clock size={20} className="text-amber-600" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-amber-600">{stats.today}</p>
+                                <p className="text-xs text-slate-500">Today</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                                <AlertTriangle size={20} className="text-red-600" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-red-600">{stats.overdue}</p>
+                                <p className="text-xs text-slate-500">Overdue</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+                                <TrendingUp size={20} className="text-emerald-600" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-emerald-600">{stats.effectiveRate}%</p>
+                                <p className="text-xs text-slate-500">Effective Rate</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Search and Export Bar */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1">
+                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                            type="text"
+                            placeholder="Search visits by store, type, or reason..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2.5 border rounded-xl dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                            >
+                                ✕
+                            </button>
+                        )}
+                    </div>
+                    <button
+                        onClick={handleExportVisits}
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl transition-colors min-h-[44px]"
+                    >
+                        <Download size={18} />
+                        <span>Export Excel</span>
+                    </button>
                 </div>
 
                 {/* List View */}
@@ -225,6 +419,14 @@ const VisitsList = () => {
                                                         </div>
                                                     )}
                                                     <div className="flex items-center gap-2">
+                                                        {/* Map Button */}
+                                                        <button
+                                                            onClick={() => openMapLink(visit.store_id)}
+                                                            className="p-2 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 text-blue-600 rounded-lg"
+                                                            title="Open Map"
+                                                        >
+                                                            <MapPin size={18} />
+                                                        </button>
                                                         {activeTab === 'scheduled' && (
                                                             <>
                                                                 <button onClick={() => setShowComplete(visit)} className="px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm">Complete</button>

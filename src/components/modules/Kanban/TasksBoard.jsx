@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { Plus, CheckSquare, CheckCircle, Edit2, Trash2, ChevronLeft, ChevronRight, Calendar, Filter } from 'lucide-react';
+import React, { useState, useContext, useMemo } from 'react';
+import { Plus, CheckSquare, CheckCircle, Edit2, Trash2, ChevronLeft, ChevronRight, Calendar, Filter, Search, Download, AlertTriangle, Clock, TrendingUp } from 'lucide-react';
 import useTranslation from '../../../hooks/useTranslation';
 import { ToastContext, LangContext } from '../../../contexts/AppContext';
 import { DataContext } from '../../../contexts/DataContext';
@@ -9,6 +9,7 @@ import Modal from '../../common/Modal';
 import ConfirmModal from '../../common/ConfirmModal';
 import TaskForm from './TaskForm';
 import PageTransition from '../../common/PageTransition';
+import * as XLSX from 'xlsx';
 
 const TasksBoard = () => {
     const { tasks, setTasks, stores, settings, refreshData: onRefresh } = useContext(DataContext);
@@ -24,10 +25,77 @@ const TasksBoard = () => {
     const [viewMode, setViewMode] = useState('board'); // 'board', 'list', 'calendar'
     const [listFilter, setListFilter] = useState('all'); // 'all', 'pending', 'in_progress', 'done'
     const [quickFilter, setQuickFilter] = useState('all'); // 'all', 'today', 'week'
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Calendar States
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(null);
+
+    // Statistics
+    const stats = useMemo(() => {
+        const now = new Date();
+        const todayStr = now.toDateString();
+        return {
+            total: tasks.length,
+            pending: tasks.filter(t => t.status === 'pending' || !t.status).length,
+            inProgress: tasks.filter(t => t.status === 'in_progress').length,
+            done: tasks.filter(t => t.status === 'done').length,
+            overdue: tasks.filter(t => {
+                if (!t.due_date || t.status === 'done') return false;
+                const dueDate = new Date(t.due_date);
+                return dueDate < now && dueDate.toDateString() !== todayStr;
+            }).length,
+            highPriority: tasks.filter(t => t.priority === 'high' && t.status !== 'done').length,
+            dueToday: tasks.filter(t => t.due_date && new Date(t.due_date).toDateString() === todayStr && t.status !== 'done').length
+        };
+    }, [tasks]);
+
+    // Search filter function
+    const matchesSearch = (task) => {
+        if (!searchQuery.trim()) return true;
+        const store = stores.find(s => s.id === task.store_id);
+        const query = searchQuery.toLowerCase();
+        return (
+            task.sub?.toLowerCase().includes(query) ||
+            task.cat?.toLowerCase().includes(query) ||
+            task.description?.toLowerCase().includes(query) ||
+            store?.name?.toLowerCase().includes(query)
+        );
+    };
+
+    // Export to Excel
+    const handleExportTasks = () => {
+        const exportData = tasks.map(task => {
+            const store = stores.find(s => s.id === task.store_id);
+            return {
+                'Store': store?.name || '-',
+                'Category': task.cat || '-',
+                'Task': task.sub || '-',
+                'Priority': task.priority || 'medium',
+                'Status': task.status || 'pending',
+                'Due Date': task.due_date ? formatDate(task.due_date) : '-',
+                'Description': task.description || '-'
+            };
+        });
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Tasks');
+
+        // Set column widths
+        ws['!cols'] = [
+            { wch: 25 }, // Store
+            { wch: 15 }, // Category
+            { wch: 25 }, // Task
+            { wch: 10 }, // Priority
+            { wch: 12 }, // Status
+            { wch: 15 }, // Due Date
+            { wch: 40 }  // Description
+        ];
+
+        XLSX.writeFile(wb, `tasks_${new Date().toISOString().split('T')[0]}.xlsx`);
+        showToast('Tasks exported successfully!', 'success');
+    };
 
     // Columns definition
     const columns = [
@@ -69,6 +137,7 @@ const TasksBoard = () => {
         });
 
         filtered = filterByTime(filtered);
+        filtered = filtered.filter(matchesSearch); // Apply search filter
 
         return filtered.sort((a, b) => {
             const order = { high: 0, medium: 1, low: 2 };
@@ -90,6 +159,9 @@ const TasksBoard = () => {
 
         // Time Filter
         filtered = filterByTime(filtered);
+
+        // Search Filter
+        filtered = filtered.filter(matchesSearch);
 
         return filtered.sort((a, b) => {
             const order = { high: 0, medium: 1, low: 2 };
@@ -168,22 +240,38 @@ const TasksBoard = () => {
     };
 
     const handleSave = async (taskData) => {
-        const table = await db.from('tasks');
-        if (editTask) {
-            // Optimistic update
-            if (setTasks) {
-                const updated = tasks.map(t => t.id === editTask.id ? { ...t, ...taskData } : t);
-                setTasks(updated);
+        try {
+            const table = await db.from('tasks');
+            if (editTask) {
+                // Optimistic update
+                if (setTasks) {
+                    const updated = tasks.map(t => t.id === editTask.id ? { ...t, ...taskData } : t);
+                    setTasks(updated);
+                }
+                const { error } = await table.update(editTask.id, taskData);
+                if (error) {
+                    // Revert optimistic update on error
+                    onRefresh();
+                    showToast(error.userMessage || 'Error updating task', 'error');
+                    return;
+                }
+            } else {
+                // For create, we wait for DB to get ID
+                const { data, error } = await table.insert(taskData);
+                if (error) {
+                    showToast(error.userMessage || 'Error creating task. Check Supabase RLS settings.', 'error');
+                    console.error('Insert error:', error);
+                    return;
+                }
             }
-            await table.update(editTask.id, taskData);
-        } else {
-            // For create, we wait for DB to get ID
-            await table.insert(taskData);
+            showToast(t('savedSuccess'), 'success');
+            setShowModal(false);
+            setEditTask(null);
+            onRefresh();
+        } catch (err) {
+            console.error('handleSave error:', err);
+            showToast(err.userMessage || 'Unexpected error. Please try again.', 'error');
         }
-        showToast(t('savedSuccess'), 'success');
-        setShowModal(false);
-        setEditTask(null);
-        onRefresh();
     };
 
     const handleDeleteConfirm = async () => {
@@ -264,6 +352,84 @@ const TasksBoard = () => {
                         </button>
                     </div>
                 </div>
+
+                {/* Stats Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                                <CheckSquare size={20} className="text-blue-600" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold dark:text-white">{stats.total}</p>
+                                <p className="text-xs text-slate-500">Total Tasks</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                                <AlertTriangle size={20} className="text-red-600" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-red-600">{stats.overdue}</p>
+                                <p className="text-xs text-slate-500">Overdue</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                                <Clock size={20} className="text-amber-600" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-amber-600">{stats.dueToday}</p>
+                                <p className="text-xs text-slate-500">Due Today</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+                                <TrendingUp size={20} className="text-emerald-600" />
+                            </div>
+                            <div>
+                                <p className="text-2xl font-bold text-emerald-600">{stats.done}</p>
+                                <p className="text-xs text-slate-500">Completed</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Search and Export Bar */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1">
+                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                            type="text"
+                            placeholder="Search tasks by name, category, or store..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2.5 border rounded-xl dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                            >
+                                ✕
+                            </button>
+                        )}
+                    </div>
+                    <button
+                        onClick={handleExportTasks}
+                        className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl transition-colors min-h-[44px]"
+                    >
+                        <Download size={18} />
+                        <span>Export Excel</span>
+                    </button>
+                </div>
+
 
                 {/* Kanban Board View */}
                 {viewMode === 'board' && (

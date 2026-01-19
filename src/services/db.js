@@ -31,6 +31,15 @@ export const initialData = {
     visits: [],
     tasks: [],
     sales_snapshots: [],
+    menus: [],
+    menu_categories: [],
+    menu_items: [],
+    item_variants: [],
+    variant_options: [],
+    item_addons: [],
+    item_choice_groups: [],
+    choice_options: [],
+    item_removables: [],
     settings: {
         visitTypes: ['Visit', 'Call', 'Meeting'],
         visitReasons: ['Sales', 'Collection', 'Support', 'Friendly', 'Training', 'Issue'],
@@ -39,6 +48,37 @@ export const initialData = {
         zones: ['Baghdad Central', 'Baghdad East', 'Basra', 'Erbil', 'Mosul', 'Karbala', 'Najaf'],
         storeCategories: ['Grocery', 'Electronics', 'Fashion', 'Pharmacy', 'Restaurant'],
     },
+};
+
+// Helper function to format Supabase errors
+const formatSupabaseError = (error, operation, table) => {
+    if (!error) return null;
+
+    // Detect RLS/Permission errors
+    if (error.code === '42501' || error.message?.includes('permission denied') ||
+        error.code === 'PGRST301' || error.message?.includes('new row violates row-level security')) {
+        return {
+            ...error,
+            userMessage: `⚠️ Permission denied on ${table}. Please run the RLS fix SQL in Supabase Dashboard.`,
+            isRLSError: true
+        };
+    }
+
+    // Detect 403 Forbidden
+    if (error.status === 403 || error.code === '403') {
+        return {
+            ...error,
+            userMessage: `⚠️ Access forbidden. Row Level Security may be blocking ${operation} on ${table}.`,
+            isRLSError: true
+        };
+    }
+
+    // Generic error
+    return {
+        ...error,
+        userMessage: error.message || `Error during ${operation} on ${table}`,
+        isRLSError: false
+    };
 };
 
 // Real Supabase Service
@@ -50,7 +90,11 @@ class SupabaseService {
             builder = builder.eq(key, query[key]);
         });
         const { count, error } = await builder;
-        if (error) throw error;
+        if (error) {
+            const formattedError = formatSupabaseError(error, 'count', table);
+            console.error(`[DB] Count error on ${table}:`, formattedError);
+            throw formattedError;
+        }
         return count;
     }
 
@@ -58,19 +102,39 @@ class SupabaseService {
         return {
             select: async () => {
                 const { data, error } = await supabase.from(table).select('*');
-                return { data, error };
+                if (error) {
+                    const formattedError = formatSupabaseError(error, 'select', table);
+                    console.error(`[DB] Select error on ${table}:`, formattedError);
+                    return { data: [], error: formattedError };
+                }
+                return { data: data || [], error: null };
             },
             insert: async (item) => {
                 const { data, error } = await supabase.from(table).insert(item).select().single();
-                return { data, error };
+                if (error) {
+                    const formattedError = formatSupabaseError(error, 'insert', table);
+                    console.error(`[DB] Insert error on ${table}:`, formattedError);
+                    return { data: null, error: formattedError };
+                }
+                return { data, error: null };
             },
             update: async (id, updates) => {
                 const { data, error } = await supabase.from(table).update(updates).eq('id', id).select().single();
-                return { data, error };
+                if (error) {
+                    const formattedError = formatSupabaseError(error, 'update', table);
+                    console.error(`[DB] Update error on ${table}:`, formattedError);
+                    return { data: null, error: formattedError };
+                }
+                return { data, error: null };
             },
             delete: async (id) => {
                 const { error } = await supabase.from(table).delete().eq('id', id);
-                return { error };
+                if (error) {
+                    const formattedError = formatSupabaseError(error, 'delete', table);
+                    console.error(`[DB] Delete error on ${table}:`, formattedError);
+                    return { error: formattedError };
+                }
+                return { error: null };
             },
         };
     }
@@ -92,6 +156,17 @@ class MockSupabaseService {
         this.data = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(initialData));
         // Migration: Ensure sales_snapshots exists
         if (!this.data.sales_snapshots) this.data.sales_snapshots = [];
+        // Migration: Ensure menu tables exist
+        if (!this.data.menus) this.data.menus = [];
+        if (!this.data.menu_categories) this.data.menu_categories = [];
+        if (!this.data.menu_items) this.data.menu_items = [];
+        // Migration: Ensure item modifier tables exist
+        if (!this.data.item_variants) this.data.item_variants = [];
+        if (!this.data.variant_options) this.data.variant_options = [];
+        if (!this.data.item_addons) this.data.item_addons = [];
+        if (!this.data.item_choice_groups) this.data.item_choice_groups = [];
+        if (!this.data.choice_options) this.data.choice_options = [];
+        if (!this.data.item_removables) this.data.item_removables = [];
 
         // Migration: Inject coordinates into existing stores if missing (Fix for Map)
         this.data.stores = this.data.stores.map(store => {

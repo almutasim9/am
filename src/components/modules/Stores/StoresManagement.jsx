@@ -187,13 +187,17 @@ const StoresManagement = () => {
     const handleSave = async (storeData) => {
         const table = await db.from('stores');
 
-        // Sanitize data
-        const { has_pos, has_sim_card, ...validData } = storeData;
+        // Prepare data - ensure boolean fields are included
+        const validData = { ...storeData };
 
         // Fix for timestamp error: Convert empty string to null
         if (validData.last_visit === '') {
             validData.last_visit = null;
         }
+
+        // Ensure boolean fields are boolean type
+        validData.has_pos = !!validData.has_pos;
+        validData.has_sim_card = !!validData.has_sim_card;
 
         let result;
 
@@ -205,7 +209,7 @@ const StoresManagement = () => {
 
         if (result.error) {
             console.error('Save error:', result.error);
-            showToast(result.error.message || 'Error saving store', 'error');
+            showToast(result.error.userMessage || result.error.message || 'Error saving store', 'error');
             return;
         }
 

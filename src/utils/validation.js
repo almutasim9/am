@@ -1,26 +1,30 @@
 import { z } from 'zod';
 
-// Store validation schema
+// Store validation schema - Updated per user requirements
 export const storeSchema = z.object({
-    id: z.string()
-        .min(1, 'Store ID is required'),
+    store_code: z.string()
+        .min(5, 'Store Code must be 5 digits')
+        .max(5, 'Store Code must be 5 digits')
+        .regex(/^\d{5}$/, 'Store Code must be exactly 5 digits (numbers only)'), // 5 أرقام فقط
     name: z.string()
         .min(2, 'Store name must be at least 2 characters')
         .max(100, 'Store name is too long'),
-    zone: z.string().min(1, 'Zone is required'),
     category: z.string()
         .min(1, 'Category is required'),
+    pinned_note: z.string().max(500, 'Note is too long').optional(), // ملاحظات - اختياري
+    has_pos: z.boolean().optional().default(false),
+    has_sim_card: z.boolean().optional().default(false),
+    zone: z.string().min(1, 'Zone is required'),
+    area_name: z.string().min(1, 'Area name is required'), // المنطقة - مطلوب
+    address: z.string().min(1, 'Address is required'), // العنوان - مطلوب
+    map_link: z.string().url('Invalid map link URL').optional().or(z.literal('')),
     owner: z.string()
         .min(2, 'Owner name is required')
         .max(100, 'Owner name is too long'),
     phone: z.string()
         .min(1, 'Phone number is required')
         .min(5, 'Phone number must be at least 5 digits'),
-    address: z.string().optional(),
-    area_name: z.string().optional(),
-    map_link: z.string().url('Invalid map link URL').optional().or(z.literal('')),
     status: z.enum(['Active', 'Closed']).default('Active'),
-    pinned_note: z.string().max(500, 'Note is too long').optional(),
     contacts: z.array(z.object({
         name: z.string().optional(),
         role: z.string().optional(),
