@@ -1,6 +1,6 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom';
-import { Search, Store, Menu, Phone, ChevronRight, Edit2, Archive, Upload, Plus, Trash2, CalendarPlus, Tag } from 'lucide-react';
+import { Search, Store, Menu, Phone, ChevronRight, Edit2, Archive, Upload, Plus, Trash2, CalendarPlus, Tag as TagIcon } from 'lucide-react';
 import { read, utils } from 'xlsx';
 import useTranslation from '../../../hooks/useTranslation';
 import { ToastContext, LangContext } from '../../../contexts/AppContext';
@@ -489,7 +489,7 @@ const StoresManagement = () => {
                                                 </span>
                                                 {Array.isArray(store.offers) && store.offers.length > 0 && (
                                                     <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
-                                                        <Tag size={12} />
+                                                        <TagIcon size={12} />
                                                         {store.offers.length} {store.offers.length === 1 ? 'Offer' : 'Offers'}
                                                     </span>
                                                 )}
