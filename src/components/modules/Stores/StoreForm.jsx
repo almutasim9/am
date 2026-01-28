@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { AlertCircle, Store, MapPin, User, Phone as PhoneIcon, Map, FileText, CreditCard, Smartphone, Check } from 'lucide-react';
+import { AlertCircle, Store, MapPin, User, Phone as PhoneIcon, Map, FileText, CreditCard, Smartphone, Check, Tag as TagIcon } from 'lucide-react';
 import useTranslation from '../../../hooks/useTranslation';
 import { LangContext } from '../../../contexts/AppContext';
 import { safeValidate, storeSchema } from '../../../utils/validation';
@@ -255,7 +255,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                     {/* Active Offers Selection */}
                     <div className="pt-4 border-t dark:border-slate-700">
                         <label className="block text-sm font-bold dark:text-slate-300 mb-2">
-                            <Tag size={14} className="inline mr-1" />
+                            <TagIcon size={14} className="inline mr-1" />
                             Active Offers (Subscriptions)
                         </label>
                         <div className="flex flex-wrap gap-2">
