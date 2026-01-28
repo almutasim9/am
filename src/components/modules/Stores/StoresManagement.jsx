@@ -1,6 +1,6 @@
-import React, { useState, useContext, useRef } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { Search, Store, Menu, Phone, ChevronRight, Edit2, Archive, Upload, Plus, Trash2, CalendarPlus } from 'lucide-react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
+import { useOutletContext, useParams, useNavigate } from 'react-router-dom';
+import { Search, Store, Menu, Phone, ChevronRight, Edit2, Archive, Upload, Plus, Trash2, CalendarPlus, Tag } from 'lucide-react';
 import { read, utils } from 'xlsx';
 import useTranslation from '../../../hooks/useTranslation';
 import { ToastContext, LangContext } from '../../../contexts/AppContext';
@@ -34,6 +34,25 @@ const StoresManagement = () => {
     const [bulkMode, setBulkMode] = useState(false); // Toggle bulk selection mode
     const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
     const fileInputRef = useRef(null);
+    const { id: urlStoreId } = useParams();
+    const navigate = useNavigate();
+
+    // Handle URL store ID
+    useEffect(() => {
+        if (urlStoreId && stores.length > 0) {
+            const store = stores.find(s => s.id === urlStoreId);
+            if (store) {
+                setSelectedStore(store);
+            }
+        }
+    }, [urlStoreId, stores]);
+
+    const handleBack = () => {
+        setSelectedStore(null);
+        if (urlStoreId) {
+            navigate('/stores', { replace: true });
+        }
+    };
 
     const filtered = stores.filter(s => {
         const matchSearch = s.name.toLowerCase().includes(search.toLowerCase());
@@ -297,7 +316,7 @@ const StoresManagement = () => {
             <PageTransition>
                 <StoreProfile
                     store={selectedStore}
-                    onBack={() => setSelectedStore(null)}
+                    onBack={handleBack}
                     onEdit={handleEditFromProfile}
                     onUpdateStore={(updatedStore) => setSelectedStore(updatedStore)}
                 />
@@ -466,6 +485,12 @@ const StoresManagement = () => {
                                                 <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${store.status === 'Active' ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'}`}>
                                                     {store.status === 'Active' ? '● Active' : '○ Closed'}
                                                 </span>
+                                                {Array.isArray(store.offers) && store.offers.length > 0 && (
+                                                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
+                                                        <Tag size={12} />
+                                                        {store.offers.length} {store.offers.length === 1 ? 'Offer' : 'Offers'}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
 
@@ -689,7 +714,7 @@ const StoresManagement = () => {
                     message={`Are you sure you want to delete ${selectedIds.length} stores? This action cannot be undone.`}
                 />
             </div>
-        </PageTransition>
+        </PageTransition >
     );
 };
 

@@ -51,6 +51,11 @@ export const translations = {
         linkToStore: 'Link to Store',
         menuActive: 'Active',
         menuInactive: 'Inactive',
+        activeOffers: 'Active Offers',
+        addStoreToOffer: 'Add Store to Offer',
+        removeOffer: 'Remove Offer',
+        noOffersFound: 'No active offers found',
+        selectOffer: 'Select Offer',
     },
 };
 

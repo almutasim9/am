@@ -18,7 +18,7 @@ const StoresManagement = lazy(() => import('./components/modules/Stores/StoresMa
 const StoresMap = lazy(() => import('./components/modules/Map/StoresMap'));
 const SettingsPanel = lazy(() => import('./components/modules/Settings/SettingsPanel'));
 const Analytics = lazy(() => import('./components/modules/Analytics/Analytics'));
-const MenuBuilder = lazy(() => import('./components/modules/MenuBuilder/MenuBuilder'));
+const ActiveOffers = lazy(() => import('./components/modules/Offers/ActiveOffers'));
 
 
 // React Query client with default options
@@ -112,9 +112,10 @@ function App() {
                       <Route path="visits" element={<PageWrapper><VisitsList /></PageWrapper>} />
                       <Route path="archive" element={<PageWrapper><ArchiveView /></PageWrapper>} />
                       <Route path="stores" element={<PageWrapper><StoresManagement /></PageWrapper>} />
+                      <Route path="stores/:id" element={<PageWrapper><StoresManagement /></PageWrapper>} />
                       <Route path="map" element={<PageWrapper><StoresMap /></PageWrapper>} />
                       <Route path="analytics" element={<PageWrapper><Analytics /></PageWrapper>} />
-                      <Route path="menu-builder" element={<PageWrapper><MenuBuilder /></PageWrapper>} />
+                      <Route path="offers" element={<PageWrapper><ActiveOffers /></PageWrapper>} />
 
                       <Route path="settings" element={<PageWrapper><SettingsPanel /></PageWrapper>} />
                     </Route>

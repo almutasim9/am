@@ -251,6 +251,39 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                             {form.has_sim_card && <Check size={16} className="text-blue-600 dark:text-blue-400" />}
                         </div>
                     </div>
+
+                    {/* Active Offers Selection */}
+                    <div className="pt-4 border-t dark:border-slate-700">
+                        <label className="block text-sm font-bold dark:text-slate-300 mb-2">
+                            <Tag size={14} className="inline mr-1" />
+                            Active Offers (Subscriptions)
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                            {(settings?.offerTypes || ["خصومات يومية", "TSN", "T+", "Winback", "punchcard", "camping"]).map(offer => {
+                                const isActive = Array.isArray(form.offers) && form.offers.includes(offer);
+                                return (
+                                    <button
+                                        key={offer}
+                                        type="button"
+                                        onClick={() => {
+                                            const currentOffers = Array.isArray(form.offers) ? form.offers : [];
+                                            const newOffers = isActive
+                                                ? currentOffers.filter(o => o !== offer)
+                                                : [...currentOffers, offer];
+                                            handleFieldChange('offers', newOffers);
+                                        }}
+                                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${isActive
+                                            ? 'bg-amber-100 border-amber-500 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+                                            : 'bg-slate-50 border-slate-200 text-slate-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-400'
+                                            }`}
+                                    >
+                                        {offer}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <p className="text-[10px] text-slate-400 mt-2 italic">Select the offers this store is currently subscribed to.</p>
+                    </div>
                 </div >
             )}
 

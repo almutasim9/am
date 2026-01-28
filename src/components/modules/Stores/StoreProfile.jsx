@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { ChevronRight, Phone, MapPin, Edit2, User, Plus, Trash2, Calendar, CheckSquare, CheckCircle, CreditCard, Smartphone, Hash, Copy, Clock, Filter, Circle, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, Phone, MapPin, Edit2, User, Plus, Trash2, Calendar, CheckSquare, CheckCircle, CreditCard, Smartphone, Hash, Copy, Clock, Filter, Circle, CheckCircle2, Tag } from 'lucide-react';
 import useTranslation from '../../../hooks/useTranslation';
 import { ToastContext } from '../../../contexts/AppContext';
 import { DataContext } from '../../../contexts/DataContext';
@@ -179,8 +179,26 @@ const StoreProfile = ({ store, onBack, onEdit, onUpdateStore }) => {
 
                             {store.pinned_note && (
                                 <p className="mt-2 text-sm bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-lg inline-block">
+                                </p>
+                            )}
+
+                            {store.pinned_note && (
+                                <p className="mt-2 text-sm bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-lg inline-block">
                                     📌 {store.pinned_note}
                                 </p>
+                            )}
+
+                            {/* Active Offers Badges */}
+                            {Array.isArray(store.offers) && store.offers.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-3">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block w-full mb-1">Active Offers</span>
+                                    {store.offers.map((offer, idx) => (
+                                        <span key={idx} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                                            <Tag size={12} />
+                                            {offer}
+                                        </span>
+                                    ))}
+                                </div>
                             )}
                         </div>
                         <div className="flex flex-wrap gap-2">
