@@ -7,7 +7,7 @@ import { safeValidate, storeSchema } from '../../../utils/validation';
 const StoreForm = ({ store, settings, onSave, onCancel }) => {
     const t = useTranslation();
     const { lang } = useContext(LangContext);
-    const [form, setForm] = useState(store || {
+    const [form, setForm] = useState(store ? { ...store, store_code: store.store_code || store.id } : {
         store_code: '', // كود المتجر الظاهر للمستخدم
         name: '',
         zone: '',
