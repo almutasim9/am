@@ -72,7 +72,7 @@ export const contactSchema = z.object({
     role: z.string()
         .min(1, 'Role is required'),
     phone: z.string()
-        .regex(/^[\+]?[0-9\s\-]{8,15}$/, 'Invalid phone number format'),
+        .regex(/^[+]?[0-9\s-]{8,15}$/, 'Invalid phone number format'),
 });
 
 // Validation helper function

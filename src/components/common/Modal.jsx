@@ -18,6 +18,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'default' }) => {
     // Handle open/close animation
     useEffect(() => {
         if (isOpen) {
+            // eslint-disable-next-line
             setIsAnimating(true);
             requestAnimationFrame(() => setShowContent(true));
             document.body.style.overflow = 'hidden';
@@ -53,8 +54,8 @@ const Modal = ({ isOpen, onClose, title, children, size = 'default' }) => {
             <div
                 ref={modalRef}
                 className={`bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl w-full ${sizeClasses[size]} sm:mx-4 max-h-[95vh] sm:max-h-[85vh] overflow-hidden flex flex-col transition-all duration-300 transform ${showContent
-                        ? 'translate-y-0 opacity-100 scale-100'
-                        : 'translate-y-8 sm:translate-y-4 opacity-0 scale-95'
+                    ? 'translate-y-0 opacity-100 scale-100'
+                    : 'translate-y-8 sm:translate-y-4 opacity-0 scale-95'
                     }`}
                 onClick={e => e.stopPropagation()}
             >

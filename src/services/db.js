@@ -143,7 +143,7 @@ class SupabaseService {
         // For now, return mock settings or fetch from a 'settings' table
         return initialData.settings;
     }
-    async updateSettings(settings) {
+    async updateSettings(_settings) {
         // Implement settings update
         return { error: null };
     }

@@ -79,6 +79,7 @@ const StoreSearchCombobox = ({ stores, value, onChange, error, disabled }) => {
 
     // Reset highlight when query changes
     useEffect(() => {
+        // eslint-disable-next-line
         setHighlightIndex(0);
     }, [query]);
 

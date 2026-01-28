@@ -17,7 +17,7 @@ export const translations = {
         zones: 'Zones', storeCategories: 'Store Categories', taskCategories: 'Task Categories',
         addNew: 'Add New', logout: 'Logout', loginError: 'Invalid credentials', savedSuccess: 'Saved successfully',
         visitReason: 'Visit Reason', visitReasons: 'Visit Reasons',
-        savedSuccess: 'Saved successfully', deletedSuccess: 'Deleted successfully', importSuccess: 'Import successful', all: 'All',
+        deletedSuccess: 'Deleted successfully', importSuccess: 'Import successful', all: 'All',
         noData: 'No data available', selectStore: 'Select Store', subTask: 'Sub Task',
         importCSV: 'Import CSV/Excel', selectFile: 'Select File', preview: 'Preview',
         importStores: 'Import Stores', duplicatesFound: 'duplicates found (will be skipped)',
@@ -44,7 +44,7 @@ export const translations = {
         price: 'Price',
         available: 'Available',
         exportExcel: 'Export Excel',
-        importExcel: 'Import Excel',
+
         addCategory: 'Add Category',
         addItem: 'Add Item',
         menuDescription: 'Description',

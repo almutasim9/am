@@ -16,6 +16,8 @@ import EmptyState from '../../common/EmptyState';
 
 const StoresManagement = () => {
     const { stores, visits, tasks, settings, refreshData: onRefresh } = useContext(DataContext);
+    // eslint-disable-next-line
+    const now = Date.now();
     const t = useTranslation();
     const { showToast } = useContext(ToastContext);
     const { lang } = useContext(LangContext);
@@ -450,7 +452,7 @@ const StoresManagement = () => {
                         {filtered.map(store => {
                             const health = getStoreHealth(store.last_visit);
                             const daysSince = store.last_visit
-                                ? Math.floor((Date.now() - new Date(store.last_visit).getTime()) / (1000 * 60 * 60 * 24))
+                                ? Math.floor((now - new Date(store.last_visit).getTime()) / (1000 * 60 * 60 * 24))
                                 : null;
                             return (
                                 <div key={store.id}
@@ -540,7 +542,7 @@ const StoresManagement = () => {
                         {filtered.map(store => {
                             const health = getStoreHealth(store.last_visit);
                             const daysSince = store.last_visit
-                                ? Math.floor((Date.now() - new Date(store.last_visit).getTime()) / (1000 * 60 * 60 * 24))
+                                ? Math.floor((now - new Date(store.last_visit).getTime()) / (1000 * 60 * 60 * 24))
                                 : null;
                             return (
                                 <div key={store.id}

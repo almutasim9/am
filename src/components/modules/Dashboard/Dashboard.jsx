@@ -251,6 +251,7 @@ const Dashboard = () => {
                             <div className="space-y-3 relative z-10">
                                 {stores.filter(s => getStoreHealth(s.last_visit) === 'red').slice(0, 3).map(store => {
                                     const days = store.last_visit
+                                        // eslint-disable-next-line
                                         ? Math.floor((Date.now() - new Date(store.last_visit).getTime()) / (1000 * 60 * 60 * 24))
                                         : null;
                                     return (

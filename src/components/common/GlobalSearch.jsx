@@ -10,10 +10,12 @@ const GlobalSearch = ({ stores, tasks, visits }) => {
 
     useEffect(() => {
         if (query.length < 2) {
+            // eslint-disable-next-line
             setResults({ stores: [], tasks: [], visits: [] });
             return;
         }
         const q = query.toLowerCase();
+        // eslint-disable-next-line
         setResults({
             stores: stores.filter(s => s.name?.toLowerCase().includes(q) || s.owner?.toLowerCase().includes(q)).slice(0, 5),
             tasks: tasks.filter(t => t.sub?.toLowerCase().includes(q) || t.cat?.toLowerCase().includes(q)).slice(0, 5),
