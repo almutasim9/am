@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react';
-import { Menu } from 'lucide-react';
-import { Outlet, useLocation } from 'react-router-dom';
+import React, { useState, useContext, useRef, useEffect } from 'react';
+import { Menu, Keyboard } from 'lucide-react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { DataContext } from '../../contexts/DataContext';
 import LoadingSpinner from '../common/LoadingSpinner';
 import GlobalSearch from '../common/GlobalSearch';
@@ -9,15 +9,20 @@ import Sidebar from './Sidebar';
 import NewTaskDialog from '../modules/Kanban/NewTaskDialog';
 import NewVisitDialog from '../modules/Visits/NewVisitDialog';
 import FloatingActionButton from '../common/FloatingActionButton';
+import KeyboardShortcutsHelp from '../common/KeyboardShortcutsHelp';
+import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts';
 
 const MainLayout = () => {
+    const navigate = useNavigate();
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const location = useLocation();
     const isDashboard = location.pathname === '/' || location.pathname === '/dashboard';
+    const searchInputRef = useRef(null);
 
     // Dialog State
     const [showTaskDialog, setShowTaskDialog] = useState(false);
     const [showVisitDialog, setShowVisitDialog] = useState(false);
+    const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
     const [preselectedStoreId, setPreselectedStoreId] = useState(null);
 
     const { stores, visits, tasks, isLoading } = useContext(DataContext);
@@ -32,6 +37,37 @@ const MainLayout = () => {
         setShowVisitDialog(true);
     };
 
+    // تفعيل اختصارات لوحة المفاتيح
+    const { shortcuts } = useKeyboardShortcuts({
+        onSearch: () => {
+            // Focus on search input
+            const searchInput = document.querySelector('input[placeholder*="البحث"]');
+            if (searchInput) {
+                searchInput.focus();
+            }
+        },
+        onNewTask: () => {
+            openTaskDialog(null);
+        },
+        onNewVisit: () => {
+            openVisitDialog(null);
+        },
+        onShowHelp: () => {
+            setShowShortcutsHelp(true);
+        },
+        onNavigate: (path) => {
+            navigate(path);
+        },
+        onEscape: () => {
+            // إغلاق جميع النوافذ المفتوحة
+            setShowTaskDialog(false);
+            setShowVisitDialog(false);
+            setShowShortcutsHelp(false);
+            setIsMobileOpen(false);
+        },
+        enabled: true
+    });
+
     if (isLoading) return <LoadingSpinner />;
 
     return (
@@ -42,6 +78,14 @@ const MainLayout = () => {
                 <div className="hidden lg:flex items-center justify-end gap-4 mb-6">
                     <GlobalSearch stores={stores} tasks={tasks} visits={visits} />
                     <NotificationBell tasks={tasks} visits={visits} stores={stores} />
+                    {/* Keyboard Shortcuts Button */}
+                    <button
+                        onClick={() => setShowShortcutsHelp(true)}
+                        className="p-2 bg-slate-100 dark:bg-slate-700 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors group"
+                        title="اختصارات لوحة المفاتيح (?)"
+                    >
+                        <Keyboard size={20} className="text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
+                    </button>
                 </div>
                 {/* Mobile Header */}
                 <div className="lg:hidden flex items-center justify-between mb-6">
@@ -67,6 +111,13 @@ const MainLayout = () => {
                 isOpen={showVisitDialog}
                 onClose={() => setShowVisitDialog(false)}
                 preselectedStoreId={preselectedStoreId}
+            />
+
+            {/* Keyboard Shortcuts Help Modal */}
+            <KeyboardShortcutsHelp
+                isOpen={showShortcutsHelp}
+                onClose={() => setShowShortcutsHelp(false)}
+                shortcuts={shortcuts}
             />
 
             {/* Quick Actions FAB - Global */}

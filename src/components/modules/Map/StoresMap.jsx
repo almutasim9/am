@@ -1,106 +1,151 @@
-import React, { useContext, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { DataContext } from '../../../contexts/DataContext';
-import { Phone, Navigation, MapPin, Database } from 'lucide-react';
+import { MapPin, RefreshCw } from 'lucide-react';
 import { db } from '../../../services/db';
-import L from 'leaflet';
 
-// Fix for default marker icon
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+// Set Mapbox Access Token
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
+// Enable RTL text plugin for Arabic support
+mapboxgl.setRTLTextPlugin(
+    'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js',
+    null,
+    true // Lazy load
+);
 
 const StoresMap = () => {
     const { stores, refreshData } = useContext(DataContext);
+    const mapContainerRef = useRef(null);
+    const mapRef = useRef(null);
+    const markersRef = useRef([]);
+    const [mapLoaded, setMapLoaded] = useState(false);
 
     // Initial center (Nineveh/Mosul)
-    const center = [36.34, 43.13];
+    const center = [43.13, 36.34]; // Mapbox uses [lng, lat]
 
-    // Filter stores with coordinates (robust check)
+    // Filter stores with coordinates
     const mapStores = stores.filter(s =>
         s.lat !== undefined && s.lat !== null &&
         s.lng !== undefined && s.lng !== null
     );
 
-    // Debug: Log store data to verify coordinates are present
-    console.log('Map: All stores:', stores.map(s => ({ id: s.id, name: s.name, lat: s.lat, lng: s.lng })));
-    console.log('Map: Stores with coordinates:', mapStores.length);
-
     useEffect(() => {
-        // Fix for map container sizing issue
-        window.dispatchEvent(new Event('resize'));
+        if (!mapContainerRef.current) return;
+        if (mapRef.current) return; // Initialize only once
+
+        try {
+            mapRef.current = new mapboxgl.Map({
+                container: mapContainerRef.current,
+                style: 'mapbox://styles/mapbox/streets-v12',
+                center: center,
+                zoom: 11,
+                pitch: 0,
+                bearing: 0,
+                antialias: true,
+                locale: {
+                    'NavigationControl.ZoomIn': 'تكبير',
+                    'NavigationControl.ZoomOut': 'تصغير',
+                    'NavigationControl.ResetBearing': 'إعادة التعيين'
+                }
+            });
+
+            // Add navigation controls
+            mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-left');
+
+            // Wait for map to load before adding markers
+            mapRef.current.on('load', () => {
+                setMapLoaded(true);
+                mapRef.current.resize();
+            });
+
+            // Handle resize for dynamic containers
+            const resizeObserver = new ResizeObserver(() => {
+                if (mapRef.current) {
+                    mapRef.current.resize();
+                }
+            });
+            resizeObserver.observe(mapContainerRef.current);
+
+            return () => {
+                resizeObserver.disconnect();
+                if (mapRef.current) {
+                    mapRef.current.remove();
+                    mapRef.current = null;
+                }
+            };
+        } catch (error) {
+            console.error('Mapbox initialization error:', error);
+        }
     }, []);
 
-    const handleInjectLocations = async () => {
-        const demoCoordinates = {
-            '1': { lat: 33.3128, lng: 44.3615 }, // Baghdad
-            '2': { lat: 30.5081, lng: 47.7835 }, // Basra
-            '3': { lat: 36.1901, lng: 44.0091 }, // Erbil
-            '4': { lat: 36.3489, lng: 43.1577 }, // Mosul
-            '5': { lat: 32.6160, lng: 44.0249 }, // Karbala
-        };
+    // Update markers when stores data changes or map loads
+    useEffect(() => {
+        if (!mapRef.current || !mapLoaded) return;
 
-        const updatedStores = stores.map(store => {
-            if (demoCoordinates[store.id]) {
-                return { ...store, ...demoCoordinates[store.id] };
-            }
-            return store;
+        // Clear existing markers
+        markersRef.current.forEach(marker => marker.remove());
+        markersRef.current = [];
+
+        // Add new markers
+        mapStores.forEach(store => {
+            // Create a custom marker element
+            const el = document.createElement('div');
+            el.className = 'custom-marker';
+            el.innerHTML = `
+                <div style="width: 32px; height: 32px; background: #2563eb; border-radius: 50%; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: transform 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+            `;
+
+            // Create Popup Content
+            const popupContent = document.createElement('div');
+            popupContent.style.cssText = 'padding: 12px; min-width: 200px; font-family: system-ui, sans-serif;';
+            popupContent.innerHTML = `
+                <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 4px; color: #1e293b;">${store.name}</h3>
+                <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">${store.category || ''} • ${store.zone || ''}</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <a href="tel:${store.phone}" style="display: flex; align-items: center; justify-content: center; padding: 8px; background: #d1fae5; color: #059669; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none;">
+                        📞 اتصال
+                    </a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}" target="_blank" style="display: flex; align-items: center; justify-content: center; padding: 8px; background: #dbeafe; color: #2563eb; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none;">
+                        🧭 اذهب
+                    </a>
+                </div>
+            `;
+
+            const popup = new mapboxgl.Popup({ offset: 25, closeButton: true })
+                .setDOMContent(popupContent);
+
+            const marker = new mapboxgl.Marker(el)
+                .setLngLat([store.lng, store.lat])
+                .setPopup(popup)
+                .addTo(mapRef.current);
+
+            markersRef.current.push(marker);
         });
 
-        // Loop update to force persistence (in a real app we'd do a batch update)
-        for (const store of updatedStores) {
-            if (store.lat) await db.from('stores').update(store.id, { lat: store.lat, lng: store.lng });
+        // Fit map to markers if there are any
+        if (mapStores.length > 0) {
+            const bounds = new mapboxgl.LngLatBounds();
+            mapStores.forEach(store => bounds.extend([store.lng, store.lat]));
+            mapRef.current.fitBounds(bounds, { padding: 50, maxZoom: 15 });
         }
+    }, [stores, mapLoaded]);
 
-        await refreshData();
-        window.location.reload(); // Force hard reload to ensure map catches up
+    const handleRefreshMap = () => {
+        if (mapRef.current) {
+            mapRef.current.resize();
+        }
     };
 
     return (
-        <div className="h-[calc(100vh-100px)] rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-lg relative z-0">
-            <MapContainer center={center} zoom={11} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-
-                {mapStores.map(store => (
-                    <Marker key={store.id} position={[store.lat, store.lng]}>
-                        <Popup>
-                            <div className="p-1 min-w-[200px]">
-                                <h3 className="font-bold text-lg mb-1">{store.name}</h3>
-                                <p className="text-sm text-slate-500 mb-3">{store.category} • {store.zone}</p>
-
-                                <div className="grid grid-cols-2 gap-2">
-                                    <a
-                                        href={`tel:${store.phone}`}
-                                        className="flex items-center justify-center gap-2 p-2 bg-emerald-50 text-emerald-600 rounded-lg text-sm font-bold hover:bg-emerald-100 transition-colors"
-                                    >
-                                        <Phone size={16} /> Call
-                                    </a>
-                                    <a
-                                        href={`https://www.google.com/maps/dir/?api=1&destination=${store.lat},${store.lng}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-2 p-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors"
-                                    >
-                                        <Navigation size={16} /> Go
-                                    </a>
-                                </div>
-                            </div>
-                        </Popup>
-                    </Marker>
-                ))}
-            </MapContainer>
+        <div className="h-[calc(100vh-100px)] rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-lg relative">
+            <div
+                ref={mapContainerRef}
+                style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
+            />
 
             {/* Floating Info Card */}
             <div className="absolute top-4 right-4 z-[1000] bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-4 rounded-xl shadow-xl border border-white/20 max-w-xs">
@@ -109,19 +154,34 @@ const StoresMap = () => {
                         <MapPin size={20} />
                     </div>
                     <div>
-                        <p className="font-bold dark:text-white">Store Map</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{mapStores.length} locations found</p>
+                        <p className="font-bold dark:text-white">خريطة المتاجر</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{mapStores.length} موقع نشط</p>
                     </div>
                 </div>
-                {mapStores.length === 0 && (
-                    <button
-                        onClick={handleInjectLocations}
-                        className="mt-2 w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
-                    >
-                        <Database size={14} /> Load Demo Data
-                    </button>
-                )}
+                <button
+                    onClick={handleRefreshMap}
+                    className="mt-2 w-full py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                    <RefreshCw size={14} /> تحديث الخريطة
+                </button>
             </div>
+
+            <style>{`
+                .mapboxgl-popup-content {
+                    border-radius: 16px;
+                    padding: 0;
+                    overflow: hidden;
+                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+                }
+                .mapboxgl-popup-close-button {
+                    padding: 8px;
+                    color: #64748b;
+                    font-size: 16px;
+                }
+                .mapboxgl-canvas {
+                    outline: none;
+                }
+            `}</style>
         </div>
     );
 };
