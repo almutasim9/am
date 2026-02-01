@@ -31,37 +31,46 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
 
     // Helper: Extract coordinates from Google Maps URL
     const extractCoordinates = (url) => {
-        if (!url) return null;
+        if (!url) return { coords: null, isShort: false };
 
-        // Pattern 1: @lat,lng format (most common)
+        const isShort = url.includes('maps.app.goo.gl') || url.includes('goo.gl/maps');
+
+        // Pattern 1: !3dLat!4dLng format (more accurate place location)
+        const d3Pattern = /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/;
+        const d3Match = url.match(d3Pattern);
+        if (d3Match) {
+            return { coords: { lat: parseFloat(d3Match[1]), lng: parseFloat(d3Match[2]) }, isShort };
+        }
+
+        // Pattern 2: @lat,lng format (map view center)
         const atPattern = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
         const atMatch = url.match(atPattern);
         if (atMatch) {
-            return { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
+            return { coords: { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) }, isShort };
         }
 
-        // Pattern 2: ?q=lat,lng format
+        // Pattern 3: ?q=lat,lng format
         const qPattern = /[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/;
         const qMatch = url.match(qPattern);
         if (qMatch) {
-            return { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
+            return { coords: { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) }, isShort };
         }
 
-        // Pattern 3: /place/lat,lng format
+        // Pattern 4: /place/lat,lng format
         const placePattern = /\/place\/(-?\d+\.\d+),(-?\d+\.\d+)/;
         const placeMatch = url.match(placePattern);
         if (placeMatch) {
-            return { lat: parseFloat(placeMatch[1]), lng: parseFloat(placeMatch[2]) };
+            return { coords: { lat: parseFloat(placeMatch[1]), lng: parseFloat(placeMatch[2]) }, isShort };
         }
 
-        // Pattern 4: ll=lat,lng format
-        const llPattern = /ll=(-?\d+\.\d+),(-?\d+\.\d+)/;
-        const llMatch = url.match(llPattern);
-        if (llMatch) {
-            return { lat: parseFloat(llMatch[1]), lng: parseFloat(llMatch[2]) };
+        // Pattern 5: center=lat,lng format
+        const centerPattern = /[?&]center=(-?\d+\.\d+),(-?\d+\.\d+)/;
+        const centerMatch = url.match(centerPattern);
+        if (centerMatch) {
+            return { coords: { lat: parseFloat(centerMatch[1]), lng: parseFloat(centerMatch[2]) }, isShort };
         }
 
-        return null;
+        return { coords: null, isShort };
     };
 
     const handleSubmit = async () => {
@@ -94,7 +103,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
 
         // Auto-extract coordinates when map_link changes
         if (field === 'map_link' && value) {
-            const coords = extractCoordinates(value);
+            const { coords, isShort } = extractCoordinates(value);
             if (coords) {
                 updatedForm.lat = coords.lat;
                 updatedForm.lng = coords.lng;
@@ -102,6 +111,8 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
             } else {
                 setCoordsExtracted(false);
             }
+            // Store if it's a short link for UI feedback
+            setForm(prev => ({ ...prev, is_short_link: isShort }));
         }
 
         setForm(updatedForm);
@@ -366,14 +377,23 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                             )}
                             {/* Coordinate extraction feedback */}
                             {form.map_link && (
-                                <div className="mt-2">
+                                <div className="mt-2 space-y-1">
                                     {coordsExtracted && form.lat ? (
-                                        <p className="text-emerald-600 text-xs flex items-center gap-1">
-                                            ✅ Coordinates extracted: {form.lat.toFixed(5)}, {form.lng.toFixed(5)}
+                                        <p className="text-emerald-600 text-[11px] flex items-center gap-1 bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-lg">
+                                            ✅ تم استخراج الموقع بنجاح: {form.lat.toFixed(5)}, {form.lng.toFixed(5)}
                                         </p>
+                                    ) : form.is_short_link ? (
+                                        <div className="text-amber-600 text-[11px] bg-amber-50 dark:bg-amber-900/20 p-2 rounded-lg">
+                                            <p className="font-bold mb-1">⚠️ تنبيه: الرابط المختصر لا يحتوي على موقع</p>
+                                            <p>روابط (maps.app.goo.gl) لا تظهر الموقع تلقائياً. يرجى:</p>
+                                            <ul className="list-disc list-inside mt-1 ml-1">
+                                                <li>فتح الرابط في المتصفح ونسخ الرابط الكامل</li>
+                                                <li>أو نسخ "رابط تضمين الخريطة" من خرائط جوجل</li>
+                                            </ul>
+                                        </div>
                                     ) : (
-                                        <p className="text-amber-600 text-xs flex items-center gap-1">
-                                            ⚠️ Could not extract coordinates. Use full Google Maps URL with @lat,lng
+                                        <p className="text-amber-600 text-[11px] flex items-center gap-1 bg-amber-50 dark:bg-amber-900/20 p-2 rounded-lg">
+                                            ⚠️ لم يتم استخراج الموقع. يرجى استخدام رابط المتصفح الكامل الذي يحتوي على الإحداثيات (@lat,lng)
                                         </p>
                                     )}
                                 </div>

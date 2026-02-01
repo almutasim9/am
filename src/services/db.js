@@ -139,12 +139,41 @@ class SupabaseService {
         };
     }
     async getSettings() {
-        // Implement settings fetching from a specific table or JSON store if needed
-        // For now, return mock settings or fetch from a 'settings' table
-        return initialData.settings;
+        // Fetch settings from 'settings' table
+        const { data, error } = await supabase
+            .from('settings')
+            .select('*')
+            .eq('id', 'global')
+            .single();
+
+        if (error || !data) {
+            // If no settings exist yet, return defaults
+            console.log('[DB] No settings found, using defaults');
+            return initialData.settings;
+        }
+
+        // Settings are stored as JSON in the 'data' column
+        return data.data || initialData.settings;
     }
-    async updateSettings(_settings) {
-        // Implement settings update
+
+    async updateSettings(settings) {
+        // Upsert settings to 'settings' table
+        const { error } = await supabase
+            .from('settings')
+            .upsert({
+                id: 'global',
+                data: settings,
+                updated_at: new Date().toISOString()
+            }, {
+                onConflict: 'id'
+            });
+
+        if (error) {
+            const formattedError = formatSupabaseError(error, 'upsert', 'settings');
+            console.error('[DB] Settings update error:', formattedError);
+            return { error: formattedError };
+        }
+
         return { error: null };
     }
 }

@@ -116,7 +116,9 @@ const ArchiveView = () => {
             });
         }
 
-        const blob = new Blob([csvContent], { type: 'text/csv' });
+        // Add UTF-8 BOM for proper Arabic text support in Excel
+        const BOM = '\uFEFF';
+        const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -155,8 +157,8 @@ const ArchiveView = () => {
                     <button
                         onClick={() => setActiveTab('visits')}
                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-all ${activeTab === 'visits'
-                                ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow'
-                                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                            ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow'
+                            : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                             }`}
                     >
                         <MapPin size={18} /> Visits ({completedVisits.length})
@@ -164,8 +166,8 @@ const ArchiveView = () => {
                     <button
                         onClick={() => setActiveTab('tasks')}
                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-all ${activeTab === 'tasks'
-                                ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow'
-                                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                            ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow'
+                            : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                             }`}
                     >
                         <CheckSquare size={18} /> Tasks ({completedTasks.length})
@@ -238,8 +240,8 @@ const ArchiveView = () => {
                                     key={val}
                                     onClick={() => setEffectiveFilter(val)}
                                     className={`px-3 py-1 rounded-full text-sm transition-colors ${effectiveFilter === val
-                                            ? 'bg-emerald-600 text-white'
-                                            : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                                        ? 'bg-emerald-600 text-white'
+                                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                                         }`}
                                 >
                                     {val === '' ? 'All' : val === 'effective' ? 'Effective' : 'Non-effective'}
@@ -259,8 +261,8 @@ const ArchiveView = () => {
                                     <div key={visit.id} className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 flex items-center justify-between hover:shadow-lg transition-shadow">
                                         <div className="flex items-center gap-4">
                                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${visit.is_effective
-                                                    ? 'bg-emerald-100 dark:bg-emerald-900/30'
-                                                    : 'bg-slate-100 dark:bg-slate-700'
+                                                ? 'bg-emerald-100 dark:bg-emerald-900/30'
+                                                : 'bg-slate-100 dark:bg-slate-700'
                                                 }`}>
                                                 <MapPin size={24} className={visit.is_effective ? 'text-emerald-600' : 'text-slate-500'} />
                                             </div>
@@ -286,8 +288,8 @@ const ArchiveView = () => {
                                                 </div>
                                             )}
                                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${visit.is_effective
-                                                    ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400'
-                                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                                                ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400'
+                                                : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                                                 }`}>
                                                 {visit.is_effective ? 'Effective' : 'Non-effective'}
                                             </span>
@@ -313,8 +315,8 @@ const ArchiveView = () => {
                                             </div>
                                         </div>
                                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${task.priority === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400' :
-                                                task.priority === 'medium' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400' :
-                                                    'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400'
+                                            task.priority === 'medium' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400' :
+                                                'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400'
                                             }`}>
                                             {task.priority}
                                         </span>
