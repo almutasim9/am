@@ -131,7 +131,7 @@ const GlobalSearch = ({ stores, tasks, visits }) => {
 
     return (
         <div className="relative">
-            <div className={`flex items-center gap-2 bg-slate-100 dark:bg-slate-700 rounded-xl px-3 py-2 transition-all ${isOpen ? 'ring-2 ring-blue-500' : ''}`}>
+            <div className={`flex items-center gap-2 bg-slate-100 dark:bg-slate-700 rounded-xl px-3 py-2 transition-all ${isOpen ? 'ring-2 ring-primary-500' : ''}`}>
                 <Search size={18} className="text-slate-400" />
                 <input
                     ref={inputRef}
@@ -175,8 +175,8 @@ const GlobalSearch = ({ stores, tasks, visits }) => {
                                                 key={result.item.id}
                                                 onClick={() => handleNavigate(`/stores/${result.item.id}`)}
                                                 className={`w-full text-left px-3 py-2 rounded-lg text-sm dark:text-white flex items-center justify-between group transition-colors ${selectedIndex === getGlobalIndex('store', i)
-                                                        ? 'bg-blue-50 dark:bg-blue-900/30'
-                                                        : 'hover:bg-slate-100 dark:hover:bg-slate-700'
+                                                    ? 'bg-primary-50 dark:bg-primary-900/30'
+                                                    : 'hover:bg-slate-100 dark:hover:bg-slate-700'
                                                     }`}
                                             >
                                                 <div>
@@ -202,8 +202,8 @@ const GlobalSearch = ({ stores, tasks, visits }) => {
                                                 key={result.item.id}
                                                 onClick={() => handleNavigate('/tasks')}
                                                 className={`w-full text-left px-3 py-2 rounded-lg text-sm dark:text-white flex items-center justify-between group transition-colors ${selectedIndex === getGlobalIndex('task', i)
-                                                        ? 'bg-blue-50 dark:bg-blue-900/30'
-                                                        : 'hover:bg-slate-100 dark:hover:bg-slate-700'
+                                                    ? 'bg-primary-50 dark:bg-primary-900/30'
+                                                    : 'hover:bg-slate-100 dark:hover:bg-slate-700'
                                                     }`}
                                             >
                                                 <div>
@@ -212,9 +212,9 @@ const GlobalSearch = ({ stores, tasks, visits }) => {
                                                         <span className="text-xs text-slate-400 mr-2">• {result.item.cat}</span>
                                                     )}
                                                 </div>
-                                                <span className={`text-xs px-1.5 py-0.5 rounded ${result.item.status === 'done' ? 'bg-emerald-100 text-emerald-600' :
-                                                        result.item.status === 'in-progress' ? 'bg-blue-100 text-blue-600' :
-                                                            'bg-slate-100 text-slate-600'
+                                                <span className={`text-xs px-1.5 py-0.5 rounded ${result.item.status === 'done' ? 'bg-secondary-100 text-secondary-600' :
+                                                    result.item.status === 'in-progress' ? 'bg-primary-100 text-primary-600' :
+                                                        'bg-slate-100 text-slate-600'
                                                     }`}>
                                                     {result.item.status === 'done' ? 'منجز' :
                                                         result.item.status === 'in-progress' ? 'قيد التنفيذ' : 'جديد'}
@@ -237,16 +237,16 @@ const GlobalSearch = ({ stores, tasks, visits }) => {
                                                     key={result.item.id}
                                                     onClick={() => handleNavigate('/visits')}
                                                     className={`w-full text-left px-3 py-2 rounded-lg text-sm dark:text-white flex items-center justify-between group transition-colors ${selectedIndex === getGlobalIndex('visit', i)
-                                                            ? 'bg-blue-50 dark:bg-blue-900/30'
-                                                            : 'hover:bg-slate-100 dark:hover:bg-slate-700'
+                                                        ? 'bg-primary-50 dark:bg-primary-900/30'
+                                                        : 'hover:bg-slate-100 dark:hover:bg-slate-700'
                                                         }`}
                                                 >
                                                     <div>
                                                         <HighlightedText text={store?.name || 'متجر'} query={query} />
                                                         <span className="text-xs text-slate-400 mr-2">• {result.item.type}</span>
                                                     </div>
-                                                    <span className={`text-xs px-1.5 py-0.5 rounded ${result.item.status === 'completed' ? 'bg-emerald-100 text-emerald-600' :
-                                                            'bg-amber-100 text-amber-600'
+                                                    <span className={`text-xs px-1.5 py-0.5 rounded ${result.item.status === 'completed' ? 'bg-secondary-100 text-secondary-600' :
+                                                        'bg-accent-100 text-accent-600'
                                                         }`}>
                                                         {result.item.status === 'completed' ? 'مكتملة' : 'مجدولة'}
                                                     </span>

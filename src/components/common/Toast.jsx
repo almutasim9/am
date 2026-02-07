@@ -25,9 +25,9 @@ const toastConfig = {
     },
     info: {
         icon: Info,
-        bg: 'bg-blue-500',
-        border: 'border-blue-600',
-        progress: 'bg-blue-300',
+        bg: 'bg-primary-500',
+        border: 'border-primary-600',
+        progress: 'bg-primary-300',
         emoji: 'ℹ️'
     }
 };
@@ -55,13 +55,11 @@ const Toast = ({ message, type = 'info', onClose, duration = 4000 }) => {
         return () => clearTimeout(timer);
     }, [duration]);
 
-
-
     return (
         <div
             className={`fixed top-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-sm z-50 transition-all duration-300 ease-out ${isVisible && !isLeaving
-                ? 'opacity-100 translate-y-0'
-                : 'opacity-0 -translate-y-4'
+                    ? 'opacity-100 translate-y-0'
+                    : 'opacity-0 -translate-y-4'
                 }`}
         >
             <div className={`${config.bg} rounded-2xl shadow-2xl overflow-hidden border-2 ${config.border}`}>
@@ -108,4 +106,3 @@ const Toast = ({ message, type = 'info', onClose, duration = 4000 }) => {
 };
 
 export default Toast;
-

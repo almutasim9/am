@@ -21,11 +21,14 @@ const PWAUpdatePrompt = () => {
     return (
         <>
             {needRefresh && (
-                <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-4 animate-bounce">
-                    <span className="text-sm">New update available!</span>
+                <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-primary-600 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-4 animate-bounce">
+                    <div className="flex flex-col">
+                        <p className="font-bold text-sm">Update Available!</p>
+                        <p className="text-[10px] opacity-80">New version is ready to install</p>
+                    </div>
                     <button
-                        onClick={() => updateServiceWorker(true)}
-                        className="px-4 py-1.5 bg-white text-emerald-600 rounded-lg text-sm font-medium hover:bg-emerald-50 transition-colors"
+                        onClick={updateServiceWorker}
+                        className="px-4 py-1.5 bg-white text-primary-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
                     >
                         Update Now
                     </button>

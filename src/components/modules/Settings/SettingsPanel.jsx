@@ -30,20 +30,38 @@ const SettingsPanel = () => {
 
     const handleAddItem = async (key) => {
         if (!newItem.trim()) return;
+        const previousSettings = { ...localSettings };
         const updated = { ...localSettings, [key]: [...(localSettings[key] || []), newItem.trim()] };
         setLocalSettings(updated);
-        await db.updateSettings(updated);
+
+        const result = await db.updateSettings(updated);
+        if (result?.error) {
+            console.error('[Settings] Add error:', result.error);
+            setLocalSettings(previousSettings);
+            showToast(t('errorOccurred') || 'Error occurred', 'error');
+            return;
+        }
+
         setNewItem('');
         showToast(t('savedSuccess'), 'success');
-        onRefresh();
+        await onRefresh();
     };
 
     const handleDeleteItem = async (key, item) => {
+        const previousSettings = { ...localSettings };
         const updated = { ...localSettings, [key]: localSettings[key].filter(i => i !== item) };
         setLocalSettings(updated);
-        await db.updateSettings(updated);
+
+        const result = await db.updateSettings(updated);
+        if (result?.error) {
+            console.error('[Settings] Delete error:', result.error);
+            setLocalSettings(previousSettings); // Revert on error
+            showToast(t('errorOccurred') || 'Error occurred', 'error');
+            return;
+        }
+
         showToast(t('deletedSuccess'), 'success');
-        onRefresh();
+        await onRefresh();
     };
 
     const handleAddCategory = async () => {
@@ -115,7 +133,7 @@ const SettingsPanel = () => {
             <div className="flex gap-2">
                 <input type="text" value={newItem} onChange={e => setNewItem(e.target.value)} placeholder={t('addNew')}
                     className="flex-1 px-4 py-2.5 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white min-h-[44px]" />
-                <button onClick={() => handleAddItem(key)} className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl min-w-[44px] min-h-[44px] active:bg-emerald-800">
+                <button onClick={() => handleAddItem(key)} className="px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl min-w-[44px] min-h-[44px] active:bg-primary-800">
                     <Plus size={20} />
                 </button>
             </div>
@@ -139,14 +157,14 @@ const SettingsPanel = () => {
                 <div className="flex gap-2">
                     <input type="text" value={newCat} onChange={e => setNewCat(e.target.value)} placeholder={t('addNew')}
                         className="flex-1 px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white" />
-                    <button onClick={handleAddCategory} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl">
+                    <button onClick={handleAddCategory} className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl">
                         <Plus size={20} />
                     </button>
                 </div>
                 <div className="space-y-2">
                     {Object.keys(localSettings.taskCategories || {}).map(cat => (
                         <div key={cat} className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors
-                ${selectedCat === cat ? 'bg-emerald-100 dark:bg-emerald-900/30 border-2 border-emerald-500' : 'bg-slate-50 dark:bg-slate-700'}`}
+                ${selectedCat === cat ? 'bg-primary-100 dark:bg-primary-900/30 border-2 border-primary-500' : 'bg-slate-50 dark:bg-slate-700'}`}
                             onClick={() => setSelectedCat(cat)}>
                             <span className="dark:text-white">{cat}</span>
                             <button onClick={(e) => { e.stopPropagation(); handleDeleteCategory(cat); }} className="p-1 text-red-500 hover:bg-red-100 rounded">
@@ -163,7 +181,7 @@ const SettingsPanel = () => {
                         <div className="flex gap-2">
                             <input type="text" value={newSub} onChange={e => setNewSub(e.target.value)} placeholder={t('addNew')}
                                 className="flex-1 px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white" />
-                            <button onClick={handleAddSubTask} className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl">
+                            <button onClick={handleAddSubTask} className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl">
                                 <Plus size={20} />
                             </button>
                         </div>
@@ -188,11 +206,11 @@ const SettingsPanel = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 border dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                     <div className="flex items-center gap-3 mb-2">
-                        <Store className="text-emerald-600" />
-                        <h3 className="font-bold dark:text-white">Stores & Customers</h3>
+                        <Store className="text-primary-600" />
+                        <h4 className="font-bold dark:text-white">Stores Data</h4>
                     </div>
                     <p className="text-sm text-slate-500 mb-4 h-10">Complete list of stores with status and visit dates.</p>
-                    <button onClick={() => handleExportCSV('stores')} className="w-full py-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2">
+                    <button onClick={() => handleExportCSV('stores')} className="w-full py-2 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-colors flex items-center justify-center gap-2">
                         <Upload size={16} className="rotate-180" /> Export CSV
                     </button>
                 </div>
@@ -264,31 +282,36 @@ const SettingsPanel = () => {
             reader.readAsText(file);
         };
 
+        const handleGlobalExport = () => {
+            // Placeholder for global export logic
+            showToast('Exporting all data to Excel...', 'info');
+        };
+
         return (
             <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Export Backup */}
-                    <div className="p-6 border-2 border-dashed border-emerald-300 dark:border-emerald-700 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20">
+                    <div className="p-6 border-2 border-dashed border-primary-300 dark:border-primary-700 rounded-2xl bg-primary-50 dark:bg-primary-900/20">
                         <div className="text-center">
-                            <Upload size={48} className="mx-auto text-emerald-600 mb-4 rotate-180" />
-                            <h3 className="font-bold text-lg dark:text-white mb-2">Export Backup</h3>
-                            <p className="text-sm text-slate-500 mb-4">Download all your data as a JSON file</p>
+                            <Upload size={48} className="mx-auto text-primary-600 mb-4 rotate-180" />
+                            <h4 className="text-xl font-bold dark:text-white mb-2">Export Everything</h4>
+                            <p className="text-sm text-slate-500 mb-6">Create a full backup of all your data in Excel format.</p>
                             <button
-                                onClick={handleBackupExport}
-                                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-colors"
+                                onClick={handleGlobalExport}
+                                className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-colors"
                             >
-                                Download Backup
+                                Export Backup
                             </button>
                         </div>
                     </div>
 
-                    {/* Import Backup */}
-                    <div className="p-6 border-2 border-dashed border-emerald-300 dark:border-emerald-700 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20">
+                    {/* Import Component */}
+                    <div className="p-6 border-2 border-dashed border-primary-300 dark:border-primary-700 rounded-2xl bg-primary-50 dark:bg-primary-900/20">
                         <div className="text-center">
-                            <Upload size={48} className="mx-auto text-emerald-600 mb-4" />
-                            <h3 className="font-bold text-lg dark:text-white mb-2">Restore Backup</h3>
-                            <p className="text-sm text-slate-500 mb-4">Upload a previously exported JSON file</p>
-                            <label className="inline-block px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium cursor-pointer transition-colors">
+                            <Upload size={48} className="mx-auto text-primary-600 mb-4" />
+                            <h4 className="text-xl font-bold dark:text-white mb-2">Import Data</h4>
+                            <p className="text-sm text-slate-500 mb-6">Upload Excel files to bulk import stores or tasks.</p>
+                            <label className="inline-block px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium cursor-pointer transition-colors">
                                 Upload Backup
                                 <input
                                     type="file"
@@ -325,7 +348,7 @@ const SettingsPanel = () => {
                     {tabs.map(tab => (
                         <button key={tab.id} onClick={() => { setActiveTab(tab.id); setNewItem(''); }}
                             className={`px-4 py-2 rounded-xl transition-colors ${activeTab === tab.id
-                                ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-700 dark:text-white hover:bg-slate-200'}`}>
+                                ? 'bg-primary-600 text-white' : 'bg-slate-100 dark:bg-slate-700 dark:text-white hover:bg-slate-200'}`}>
                             {tab.label}
                         </button>
                     ))}

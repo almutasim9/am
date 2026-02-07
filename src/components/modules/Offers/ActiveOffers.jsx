@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Percent, Plus, Trash2, Store, Tag, Search, Filter, X, Phone, MessageCircle, Edit2 } from 'lucide-react';
+import { Percent, Plus, Trash2, Store, Tag, Search, Filter, X, Phone, MessageCircle, Edit2, Gift, ExternalLink } from 'lucide-react';
 import { DataContext } from '../../../contexts/DataContext';
 import { ToastContext } from '../../../contexts/AppContext';
 import useTranslation from '../../../hooks/useTranslation';
@@ -35,6 +35,12 @@ const ActiveOffers = () => {
     const totalActiveStores = storesWithOffers.length;
     const totalSubscriptions = storesWithOffers.reduce((acc, s) => acc + s.offers.length, 0);
     const allActiveOfferTypes = [...new Set(storesWithOffers.flatMap(s => s.offers))];
+
+    const stats = {
+        totalStores: totalActiveStores,
+        totalOffers: allActiveOfferTypes.length,
+        totalLinks: totalSubscriptions // Assuming links relate to subscriptions for now
+    };
 
     // Apply UI filters
     const filteredStores = storesWithOffers.filter(store => {
@@ -122,47 +128,54 @@ const ActiveOffers = () => {
             <div className="space-y-8 pb-10">
                 {/* Modern Header */}
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                    <div className="flex items-center gap-5">
-                        <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 text-white rounded-[2rem] flex items-center justify-center shadow-xl shadow-primary-500/30">
-                            <Percent size={32} strokeWidth={2.5} />
-                        </div>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <h1 className="text-3xl font-black dark:text-white tracking-tight">{t('activeOffers') || 'Active Offers'}</h1>
-                            <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2">
-                                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                                Manage store subscriptions and discounts
-                            </p>
+                            <h1 className="text-2xl font-bold dark:text-white flex items-center gap-3">
+                                <Gift className="text-primary-600" size={28} />
+                                {t('activeOffers')}
+                            </h1>
+                            <p className="text-slate-500 dark:text-slate-400 mt-1">Manage and track promotional offers across stores</p>
                         </div>
+
+                        <button
+                            onClick={() => setIsAddModalOpen(true)}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-all shadow-lg shadow-primary-500/25 active:scale-[0.98] font-bold"
+                        >
+                            <Plus size={20} />
+                            Associate New Offer
+                        </button>
                     </div>
-                    <button
-                        onClick={() => setIsAddModalOpen(true)}
-                        className="group flex items-center gap-3 px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white rounded-2xl shadow-xl shadow-primary-500/20 transition-all font-bold hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                        <div className="p-1 bg-white/20 rounded-lg group-hover:rotate-90 transition-transform">
-                            <Plus size={20} strokeWidth={3} />
-                        </div>
-                        {t('addStoreToOffer') || 'Add Store to Offer'}
-                    </button>
                 </div>
 
                 {/* Stats Summary Panel */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {[
-                        { label: 'Total Stores', value: stores.length, icon: Store, color: 'text-slate-600', bg: 'bg-slate-100 dark:bg-slate-800' },
-                        { label: 'Active in Offers', value: totalActiveStores, icon: Store, color: 'text-primary-600', bg: 'bg-primary-50 dark:bg-primary-900/40' },
-                        { label: 'Total Subscriptions', value: totalSubscriptions, icon: Tag, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/40' },
-                        { label: 'Participation', value: `${((totalActiveStores / stores.length) * 100 || 0).toFixed(2)}%`, icon: Filter, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/40' },
-                    ].map((stat, i) => (
-                        <div key={i} className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-6 rounded-[2.5rem] shadow-sm flex items-center gap-5 hover:shadow-md transition-shadow">
-                            <div className={`p-4 ${stat.bg} ${stat.color} rounded-2xl`}>
-                                <stat.icon size={24} />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">{stat.label}</p>
-                                <p className="text-2xl font-black dark:text-white leading-none">{stat.value}</p>
-                            </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="flex items-center gap-4 p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div className="bg-primary-100 dark:bg-primary-900/30 p-2 rounded-lg">
+                            <Store className="text-primary-600 dark:text-primary-400" size={20} />
                         </div>
-                    ))}
+                        <div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Participating Stores</p>
+                            <p className="text-lg font-bold dark:text-white leading-none">{stats.totalStores}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4 p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div className="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-lg">
+                            <Gift className="text-amber-600 dark:text-amber-400" size={20} />
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Distinct Offers</p>
+                            <p className="text-lg font-bold dark:text-white leading-none">{stats.totalOffers}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4 p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div className="bg-violet-100 dark:bg-violet-900/30 p-2 rounded-lg">
+                            <ExternalLink className="text-violet-600 dark:text-violet-400" size={20} />
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Active Links</p>
+                            <p className="text-lg font-bold dark:text-white leading-none">{stats.totalLinks}</p>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Offer Type Breakdown */}
@@ -245,7 +258,7 @@ const ActiveOffers = () => {
                                                                 href={`https://wa.me/${store.phone.replace(/\D/g, '')}`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="p-1 px-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-200 transition-all flex items-center gap-1 text-[10px] font-black"
+                                                                className="p-1 px-1.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-200 transition-all flex items-center gap-1 text-[10px] font-black"
                                                             >
                                                                 <MessageCircle size={10} /> WhatsApp
                                                             </a>
@@ -338,7 +351,7 @@ const ActiveOffers = () => {
                                         if (selectedStoreId) setSelectedStoreId('');
                                     }}
                                     onFocus={() => !isEditing && setIsStoreDropdownOpen(true)}
-                                    className={`w-full pl-14 pr-12 py-5 bg-slate-50 dark:bg-slate-900 border-2 rounded-3xl dark:text-white focus:ring-4 focus:ring-primary-500/10 outline-none transition-all font-bold ${selectedStoreId ? 'border-emerald-500/50 text-emerald-700 bg-emerald-50/30' : 'border-slate-100 dark:border-slate-700'} ${isEditing ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                    className={`w-full pl-14 pr-12 py-5 bg-slate-50 dark:bg-slate-900 border-2 rounded-3xl dark:text-white focus:ring-4 focus:ring-primary-500/10 outline-none transition-all font-bold ${selectedStoreId ? 'border-primary-500/50 text-primary-700 bg-primary-50/30' : 'border-slate-100 dark:border-slate-700'} ${isEditing ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 />
                                 {modalStoreSearch && !isEditing && (
                                     <button
@@ -414,8 +427,9 @@ const ActiveOffers = () => {
                                             </div>
                                             {type}
                                             {isSelected && (
-                                                <div className="absolute top-4 right-4 text-primary-500">
-                                                    <Search size={16} />
+                                                <div className="flex items-center gap-1 mt-1 text-xs font-bold text-primary-600 dark:text-primary-400 uppercase tracking-wider">
+                                                    <AlertCircle size={12} />
+                                                    Active Assignment
                                                 </div>
                                             )}
                                         </button>

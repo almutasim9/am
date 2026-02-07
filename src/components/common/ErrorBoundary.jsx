@@ -55,8 +55,8 @@ class ErrorBoundary extends Component {
 
                         <div className="flex gap-3">
                             <button
-                                onClick={this.handleRefresh}
-                                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-colors"
+                                onClick={() => window.location.reload()}
+                                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-colors"
                             >
                                 <RefreshCw size={18} />
                                 Refresh

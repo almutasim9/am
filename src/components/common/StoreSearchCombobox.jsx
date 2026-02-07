@@ -92,7 +92,7 @@ const StoreSearchCombobox = ({ stores, value, onChange, error, disabled }) => {
                     onClick={() => { setIsOpen(true); inputRef.current?.focus(); }}
                 >
                     <div className="flex items-center gap-3">
-                        <Store size={18} className="text-emerald-600 dark:text-emerald-400" />
+                        <Store size={18} className="text-primary-600 dark:text-primary-400" />
                         <div>
                             <p className="font-medium text-slate-800 dark:text-white">{selectedStore.name}</p>
                             <p className="text-xs text-slate-500">{selectedStore.id} • {selectedStore.owner}</p>

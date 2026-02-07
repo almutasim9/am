@@ -60,9 +60,9 @@ const Modal = ({ isOpen, onClose, title, children, size = 'default' }) => {
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between p-5 border-b dark:border-slate-700 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-800">
+                <div className="flex items-center justify-between p-5 border-b dark:border-slate-700 bg-gradient-to-r from-slate-50/50 to-white dark:from-slate-800 dark:to-slate-800/50">
                     {/* Drag indicator for mobile */}
-                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full sm:hidden" />
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full sm:hidden" />
 
                     <h2 id="modal-title" className="text-xl font-bold dark:text-white flex items-center gap-2">
                         {title}
@@ -71,7 +71,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'default' }) => {
                         ref={closeButtonRef}
                         onClick={onClose}
                         aria-label="Close modal"
-                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl min-w-[40px] min-h-[40px] flex items-center justify-center transition-colors focus:ring-2 focus:ring-emerald-500 focus:outline-none active:scale-95"
+                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl min-w-[40px] min-h-[40px] flex items-center justify-center transition-all focus:ring-2 focus:ring-primary-500 focus:outline-none active:scale-90"
                     >
                         <X size={20} className="text-slate-500" aria-hidden="true" />
                     </button>

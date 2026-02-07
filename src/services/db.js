@@ -98,43 +98,37 @@ class SupabaseService {
         return count;
     }
 
-    async from(table) {
+    from(table) {
         return {
-            select: async () => {
-                const { data, error } = await supabase.from(table).select('*');
-                if (error) {
-                    const formattedError = formatSupabaseError(error, 'select', table);
-                    console.error(`[DB] Select error on ${table}:`, formattedError);
-                    return { data: [], error: formattedError };
-                }
-                return { data: data || [], error: null };
+            select: (query = '*', options = {}) => {
+                let builder = supabase.from(table).select(query, options);
+
+                const wrapper = {
+                    eq: (col, val) => { builder = builder.eq(col, val); return wrapper; },
+                    range: async (from, to) => {
+                        const { data, error, count } = await builder.range(from, to);
+                        return { data, count, error: formatSupabaseError(error, 'select', table) };
+                    },
+                    then: async (resolve) => {
+                        const { data, error } = await builder;
+                        return resolve({ data, error: formatSupabaseError(error, 'select', table) });
+                    },
+                    // Allow direct access to builder if needed
+                    builder
+                };
+                return wrapper;
             },
             insert: async (item) => {
                 const { data, error } = await supabase.from(table).insert(item).select().single();
-                if (error) {
-                    const formattedError = formatSupabaseError(error, 'insert', table);
-                    console.error(`[DB] Insert error on ${table}:`, formattedError);
-                    return { data: null, error: formattedError };
-                }
-                return { data, error: null };
+                return { data, error: formatSupabaseError(error, 'insert', table) };
             },
             update: async (id, updates) => {
                 const { data, error } = await supabase.from(table).update(updates).eq('id', id).select().single();
-                if (error) {
-                    const formattedError = formatSupabaseError(error, 'update', table);
-                    console.error(`[DB] Update error on ${table}:`, formattedError);
-                    return { data: null, error: formattedError };
-                }
-                return { data, error: null };
+                return { data, error: formatSupabaseError(error, 'update', table) };
             },
             delete: async (id) => {
                 const { error } = await supabase.from(table).delete().eq('id', id);
-                if (error) {
-                    const formattedError = formatSupabaseError(error, 'delete', table);
-                    console.error(`[DB] Delete error on ${table}:`, formattedError);
-                    return { error: formattedError };
-                }
-                return { error: null };
+                return { error: formatSupabaseError(error, 'delete', table) };
             },
         };
     }
@@ -143,7 +137,7 @@ class SupabaseService {
         const { data, error } = await supabase
             .from('settings')
             .select('*')
-            .eq('id', 'global')
+            .eq('id', 1)
             .single();
 
         if (error || !data) {
@@ -161,9 +155,8 @@ class SupabaseService {
         const { error } = await supabase
             .from('settings')
             .upsert({
-                id: 'global',
-                data: settings,
-                updated_at: new Date().toISOString()
+                id: 1,
+                data: settings
             }, {
                 onConflict: 'id'
             });
@@ -210,22 +203,38 @@ class MockSupabaseService {
     }
 
     save() { localStorage.setItem('crm_data', JSON.stringify(this.data)); }
-    async from(table) {
-        await delay(100);
+    from(table) {
         return {
-            select: async () => ({ data: [...this.data[table]], error: null }),
+            select: (query = '*', options = {}) => {
+                const wrapper = {
+                    eq: (col, val) => { /* Mock EQ - not fully implemented for all fields but can be added if needed */ return wrapper; },
+                    range: async (from, to) => {
+                        await delay(100);
+                        const data = this.data[table].slice(from, to + 1);
+                        return { data: [...data], count: this.data[table].length, error: null };
+                    },
+                    then: async (resolve) => {
+                        await delay(100);
+                        return resolve({ data: [...this.data[table]], error: null });
+                    }
+                };
+                return wrapper;
+            },
             insert: async (item) => {
+                await delay(100);
                 const newItem = { ...item, id: item.id || Date.now().toString() };
                 this.data[table].push(newItem);
                 this.save();
                 return { data: newItem, error: null };
             },
             update: async (id, updates) => {
+                await delay(100);
                 const idx = this.data[table].findIndex(i => i.id === id);
                 if (idx !== -1) { this.data[table][idx] = { ...this.data[table][idx], ...updates }; this.save(); }
                 return { data: this.data[table][idx], error: null };
             },
             delete: async (id) => {
+                await delay(100);
                 this.data[table] = this.data[table].filter(i => i.id !== id);
                 this.save();
                 return { error: null };

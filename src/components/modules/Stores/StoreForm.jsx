@@ -125,8 +125,8 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
         <button
             type="button"
             onClick={() => setActiveSection(id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeSection === id
-                ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeSection === id
+                ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 shadow-sm'
                 : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700'
                 }`}
         >
@@ -470,11 +470,11 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                             else if (activeSection === 'contact') setActiveSection('location');
                         }}
                         disabled={activeSection === 'basic'}
-                        className="text-emerald-600 hover:underline disabled:opacity-50 disabled:no-underline"
+                        className="text-primary-600 dark:text-primary-400 font-bold hover:underline disabled:opacity-50 disabled:no-underline"
                     >
                         ← Previous
                     </button>
-                    <span className="text-slate-400">
+                    <span className="text-slate-400 font-medium">
                         {activeSection === 'basic' ? '1' : activeSection === 'location' ? '2' : '3'} / 3
                     </span>
                     <button
@@ -484,7 +484,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                             else if (activeSection === 'location') setActiveSection('contact');
                         }}
                         disabled={activeSection === 'contact'}
-                        className="text-emerald-600 hover:underline disabled:opacity-50 disabled:no-underline"
+                        className="text-primary-600 dark:text-primary-400 font-bold hover:underline disabled:opacity-50 disabled:no-underline"
                     >
                         Next →
                     </button>
@@ -495,7 +495,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                     <button
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="flex-1 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {isSubmitting ? (
                             <>

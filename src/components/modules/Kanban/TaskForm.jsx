@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { AlertCircle, Calendar } from 'lucide-react';
+import { AlertCircle, Calendar, Save } from 'lucide-react';
 import useTranslation from '../../../hooks/useTranslation';
 import { LangContext } from '../../../contexts/AppContext';
 import { safeValidate, taskSchema } from '../../../utils/validation';
@@ -36,8 +36,9 @@ const TaskForm = ({ task, stores, settings, onSave, onCancel }) => {
     const setQuickDate = (days) => {
         const d = new Date();
         d.setDate(d.getDate() + days);
-        setForm({ ...form, due_date: d.toISOString().split('T')[0] });
-        if (errors.due_date) setErrors({ ...errors, due_date: null });
+        const value = d.toISOString().split('T')[0];
+        setForm(prev => ({ ...prev, due_date: value }));
+        if (errors.due_date) setErrors(prev => ({ ...prev, due_date: null }));
     };
 
     const applySmartPreset = (preset) => {
@@ -70,9 +71,9 @@ const TaskForm = ({ task, stores, settings, onSave, onCancel }) => {
     };
 
     const handleFieldChange = (field, value) => {
-        setForm({ ...form, [field]: value });
+        setForm(prev => ({ ...prev, [field]: value }));
         if (errors[field]) {
-            setErrors({ ...errors, [field]: null });
+            setErrors(prev => ({ ...prev, [field]: null }));
         }
     };
 
@@ -92,7 +93,7 @@ const TaskForm = ({ task, stores, settings, onSave, onCancel }) => {
                 </button>
                 <button
                     onClick={() => applySmartPreset('visit_next_week')}
-                    className="flex items-center justify-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors"
+                    className="flex items-center justify-center gap-2 p-3 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-xl border border-primary-100 dark:border-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors"
                 >
                     <span className="text-lg">📅</span>
                     <div className="text-left leading-tight">
@@ -129,8 +130,9 @@ const TaskForm = ({ task, stores, settings, onSave, onCancel }) => {
                     <select
                         value={form.cat}
                         onChange={e => {
-                            handleFieldChange('cat', e.target.value);
-                            setForm(prev => ({ ...prev, cat: e.target.value, sub: '' }));
+                            const value = e.target.value;
+                            setForm(prev => ({ ...prev, cat: value, sub: '' }));
+                            if (errors.cat) setErrors(prev => ({ ...prev, cat: null }));
                         }}
                         className={`w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white ${errors.cat ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''
                             }`}
@@ -239,14 +241,10 @@ const TaskForm = ({ task, stores, settings, onSave, onCancel }) => {
                 <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95"
                 >
-                    {isSubmitting ? (
-                        <>
-                            <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-                            Saving...
-                        </>
-                    ) : t('save')}
+                    {isSubmitting ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <Save size={20} />}
+                    {task?.id ? t('saveChanges') : t('createTask')}
                 </button>
                 <button
                     onClick={onCancel}

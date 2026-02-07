@@ -1,5 +1,5 @@
 import React, { useState, useContext, useMemo } from 'react';
-import { Archive, Calendar, Filter, Download, CheckSquare, MapPin, Search, X, Star } from 'lucide-react';
+import { Archive, Calendar, Filter, Download, CheckSquare, MapPin, Search, X, Star, Store } from 'lucide-react';
 import useTranslation from '../../../hooks/useTranslation';
 import { DataContext } from '../../../contexts/DataContext';
 import { ToastContext } from '../../../contexts/AppContext';
@@ -134,43 +134,40 @@ const ArchiveView = () => {
         <PageTransition>
             <div className="space-y-6">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2">
-                            <Archive className="text-slate-500" /> Archive
+                        <h1 className="text-2xl font-bold dark:text-white flex items-center gap-3">
+                            <Archive className="text-primary-600" size={28} />
+                            {t('archive')}
                         </h1>
-                        <p className="text-sm text-slate-500 mt-1">
-                            {filteredVisits.length} completed visits • {filteredTasks.length} completed tasks
-                        </p>
+                        <p className="text-slate-500 dark:text-slate-400 mt-1">Review historical visits and completed tasks</p>
                     </div>
+
                     <button
                         onClick={exportCSV}
                         disabled={currentData.length === 0}
-                        className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl transition-all shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-[0.98] font-bold"
                     >
-                        <Download size={18} /> Export CSV
+                        <Download size={20} />
+                        Export to CSV
                     </button>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                <div className="flex bg-slate-100 dark:bg-slate-700 p-1.5 rounded-2xl w-full sm:w-auto">
                     <button
                         onClick={() => setActiveTab('visits')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-all ${activeTab === 'visits'
-                            ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow'
-                            : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                            }`}
+                        className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2 font-bold ${activeTab === 'visits' ? 'bg-white dark:bg-slate-600 shadow-sm text-primary-600' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
-                        <MapPin size={18} /> Visits ({completedVisits.length})
+                        <Calendar size={18} />
+                        Visits
                     </button>
                     <button
                         onClick={() => setActiveTab('tasks')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-all ${activeTab === 'tasks'
-                            ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow'
-                            : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                            }`}
+                        className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2 font-bold ${activeTab === 'tasks' ? 'bg-white dark:bg-slate-600 shadow-sm text-primary-600' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
-                        <CheckSquare size={18} /> Tasks ({completedTasks.length})
+                        <CheckSquare size={18} />
+                        Tasks
                     </button>
                 </div>
 
@@ -240,7 +237,7 @@ const ArchiveView = () => {
                                     key={val}
                                     onClick={() => setEffectiveFilter(val)}
                                     className={`px-3 py-1 rounded-full text-sm transition-colors ${effectiveFilter === val
-                                        ? 'bg-emerald-600 text-white'
+                                        ? 'bg-primary-600 text-white'
                                         : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                                         }`}
                                 >
@@ -260,11 +257,8 @@ const ArchiveView = () => {
                                 return (
                                     <div key={visit.id} className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 flex items-center justify-between hover:shadow-lg transition-shadow">
                                         <div className="flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${visit.is_effective
-                                                ? 'bg-emerald-100 dark:bg-emerald-900/30'
-                                                : 'bg-slate-100 dark:bg-slate-700'
-                                                }`}>
-                                                <MapPin size={24} className={visit.is_effective ? 'text-emerald-600' : 'text-slate-500'} />
+                                            <div className="bg-primary-50 dark:bg-primary-900/20 p-2 rounded-lg">
+                                                <Store className="text-primary-600 dark:text-primary-400" size={20} />
                                             </div>
                                             <div>
                                                 <p className="font-bold dark:text-white">{store?.name || 'Unknown'}</p>
@@ -288,7 +282,7 @@ const ArchiveView = () => {
                                                 </div>
                                             )}
                                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${visit.is_effective
-                                                ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400'
+                                                ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-400'
                                                 : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                                                 }`}>
                                                 {visit.is_effective ? 'Effective' : 'Non-effective'}
@@ -303,8 +297,8 @@ const ArchiveView = () => {
                                 return (
                                     <div key={task.id} className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 flex items-center justify-between hover:shadow-lg transition-shadow">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
-                                                <CheckSquare size={24} className="text-emerald-600" />
+                                            <div className="bg-primary-50 dark:bg-primary-900/20 p-2 rounded-lg">
+                                                <CheckSquare className="text-primary-600 dark:text-primary-400" size={20} />
                                             </div>
                                             <div>
                                                 <p className="font-bold dark:text-white">{store?.name || 'Unknown'}</p>

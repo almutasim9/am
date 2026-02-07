@@ -90,11 +90,11 @@ const LoginScreen = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-primary-950 to-slate-900 p-4">
             <div className="w-full max-w-md">
                 <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20">
                     <div className="text-center mb-8">
-                        <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                        <div className="w-20 h-20 bg-gradient-to-br from-primary-600 to-indigo-700 rounded-2xl mx-auto mb-4 flex items-center justify-center">
                             <Store size={40} className="text-white" />
                         </div>
                         <h1 className="text-3xl font-bold text-white mb-2">AM-CRM</h1>
@@ -113,7 +113,7 @@ const LoginScreen = () => {
                                 placeholder="admin@example.com"
                                 disabled={isLoading || isBlocked}
                                 autoComplete="email"
-                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:opacity-50"
+                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50"
                             />
                         </div>
                         <div>
@@ -128,7 +128,7 @@ const LoginScreen = () => {
                                     onChange={e => setPassword(e.target.value)}
                                     disabled={isLoading || isBlocked}
                                     autoComplete="current-password"
-                                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:opacity-50 pr-12"
+                                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 pr-12"
                                 />
                                 <button
                                     type="button"
@@ -152,7 +152,7 @@ const LoginScreen = () => {
                         <button
                             type="submit"
                             disabled={isLoading || isBlocked}
-                            className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full py-3 bg-gradient-to-r from-primary-600 to-indigo-700 hover:from-primary-700 hover:to-indigo-800 text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-primary-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {isLoading ? (
                                 <>

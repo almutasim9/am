@@ -1,10 +1,37 @@
-import React, { createContext, useContext } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { createContext, useContext, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { db } from '../services/db';
+
+// Repositories
+import StoreRepository from '../repositories/StoreRepository';
+import VisitRepository from '../repositories/VisitRepository';
+import TaskRepository from '../repositories/TaskRepository';
+import SettingsRepository from '../repositories/SettingsRepository';
+import BaseRepository from '../repositories/BaseRepository';
+
+// Services
+import DashboardService from '../services/domain/DashboardService';
+import StoreService from '../services/domain/StoreService';
+import VisitService from '../services/domain/VisitService';
 
 export const DataContext = createContext(null);
 
+// Initialize repositories
+const storeRepo = new StoreRepository(db);
+const visitRepo = new VisitRepository(db);
+const taskRepo = new TaskRepository(db);
+const settingsRepo = new SettingsRepository(db);
+const menuRepo = new BaseRepository('menus', db);
+const categoryRepo = new BaseRepository('menu_categories', db);
+const itemRepo = new BaseRepository('menu_items', db);
+
+// Initialize services
+const dashboardService = new DashboardService({ stores: storeRepo, visits: visitRepo, tasks: taskRepo });
+const storeService = new StoreService(storeRepo);
+const visitService = new VisitService(visitRepo);
+
 // Query keys for cache management
+// ... (rest of the file until DataProvider)
 export const queryKeys = {
     stores: ['stores'],
     visits: ['visits'],
@@ -18,70 +45,14 @@ export const queryKeys = {
 // Stale time: how long data is considered fresh (5 minutes)
 const STALE_TIME = 5 * 60 * 1000;
 
-// Fetchers with error handling
-const fetchStores = async () => {
-    const table = await db.from('stores');
-    const { data, error } = await table.select();
-    if (error) {
-        console.error('Error fetching stores:', error);
-        throw new Error(error.message || 'Failed to fetch stores');
-    }
-    return data || [];
-};
-
-const fetchVisits = async () => {
-    const table = await db.from('visits');
-    const { data, error } = await table.select();
-    if (error) {
-        console.error('Error fetching visits:', error);
-        throw new Error(error.message || 'Failed to fetch visits');
-    }
-    return data || [];
-};
-
-const fetchTasks = async () => {
-    const table = await db.from('tasks');
-    const { data, error } = await table.select();
-    if (error) {
-        console.error('Error fetching tasks:', error);
-        throw new Error(error.message || 'Failed to fetch tasks');
-    }
-    return data || [];
-};
-
-const fetchSettings = async () => {
-    return await db.getSettings();
-};
-
-const fetchMenus = async () => {
-    const table = await db.from('menus');
-    const { data, error } = await table.select();
-    if (error) {
-        console.error('Error fetching menus:', error);
-        throw new Error(error.message || 'Failed to fetch menus');
-    }
-    return data || [];
-};
-
-const fetchMenuCategories = async () => {
-    const table = await db.from('menu_categories');
-    const { data, error } = await table.select();
-    if (error) {
-        console.error('Error fetching menu categories:', error);
-        throw new Error(error.message || 'Failed to fetch menu categories');
-    }
-    return data || [];
-};
-
-const fetchMenuItems = async () => {
-    const table = await db.from('menu_items');
-    const { data, error } = await table.select();
-    if (error) {
-        console.error('Error fetching menu items:', error);
-        throw new Error(error.message || 'Failed to fetch menu items');
-    }
-    return data || [];
-};
+// Fetchers using repositories
+const fetchStores = () => storeRepo.getAll();
+const fetchVisits = () => visitRepo.getAll();
+const fetchTasks = () => taskRepo.getAll();
+const fetchSettings = () => settingsRepo.getSettings();
+const fetchMenus = () => menuRepo.getAll();
+const fetchMenuCategories = () => categoryRepo.getAll();
+const fetchMenuItems = () => itemRepo.getAll();
 
 export const DataProvider = ({ children }) => {
     const queryClient = useQueryClient();
@@ -90,6 +61,15 @@ export const DataProvider = ({ children }) => {
     const storesQuery = useQuery({
         queryKey: queryKeys.stores,
         queryFn: fetchStores,
+        staleTime: STALE_TIME,
+    });
+
+    // Infinite Query for Stores page (Infinite Scroll)
+    const storesInfiniteQuery = useInfiniteQuery({
+        queryKey: ['stores', 'infinite'],
+        queryFn: ({ pageParam = 0 }) => storeRepo.getPaginated(pageParam, 25, {}),
+        getNextPageParam: (lastPage, allPages) => lastPage.hasMore ? allPages.length : undefined,
+        initialPageParam: 0,
         staleTime: STALE_TIME,
     });
 
@@ -202,6 +182,24 @@ export const DataProvider = ({ children }) => {
     const error = storesQuery.error || visitsQuery.error ||
         tasksQuery.error || settingsQuery.error;
 
+    // Provide repositories in context for direct access if needed
+    const repos = useMemo(() => ({
+        stores: storeRepo,
+        visits: visitRepo,
+        tasks: taskRepo,
+        settings: settingsRepo,
+        menus: menuRepo,
+        categories: categoryRepo,
+        items: itemRepo
+    }), []);
+
+    // Provide domain services in context
+    const services = useMemo(() => ({
+        dashboard: dashboardService,
+        stores: storeService,
+        visits: visitService
+    }), []);
+
     return (
         <DataContext.Provider value={{
             // Data
@@ -216,6 +214,13 @@ export const DataProvider = ({ children }) => {
             // Loading & Error states
             isLoading,
             error,
+
+            // Repositories & Services
+            repos,
+            services,
+
+            // Infinite Query
+            storesInfinite: storesInfiniteQuery,
 
             // Setters for optimistic updates
             setStores,

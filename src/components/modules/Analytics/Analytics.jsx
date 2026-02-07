@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { BarChart3, TrendingUp, Store, CheckSquare, Calendar, ArrowLeft, Target, Users, Zap, Award, Download } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart3, TrendingUp, Store, CheckSquare, Calendar, ArrowLeft, Target, Users, Zap, Award, Download, PieChart as PieChartIcon } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid } from 'recharts';
 import useTranslation from '../../../hooks/useTranslation';
 import { DataContext } from '../../../contexts/DataContext';
 import { getStoreHealth } from '../../../utils/helpers';
@@ -89,18 +89,20 @@ const Analytics = () => {
                         <Link to="/" className="p-2 bg-slate-100 dark:bg-slate-700 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
                             <ArrowLeft size={20} className="text-slate-600 dark:text-slate-300" />
                         </Link>
-                        <div>
-                            <h1 className="text-2xl font-bold dark:text-white flex items-center gap-2">
-                                <BarChart3 className="text-emerald-600" />
-                                Analytics
-                            </h1>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">Performance & Statistics</p>
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <h1 className="text-2xl font-bold dark:text-white flex items-center gap-3">
+                                    <BarChart3 className="text-primary-600" size={28} />
+                                    {t('analytics')}
+                                </h1>
+                                <p className="text-slate-500 dark:text-slate-400 mt-1">Real-time performance metrics and store insights</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Performance Overview */}
-                <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-5 text-white shadow-lg">
+                <div className="bg-gradient-to-r from-primary-600 to-primary-800 rounded-2xl p-5 text-white shadow-lg">
                     <div className="flex items-center gap-2 mb-4">
                         <TrendingUp size={20} />
                         <h2 className="font-bold">Weekly Performance</h2>
@@ -108,15 +110,15 @@ const Analytics = () => {
                     <div className="grid grid-cols-3 gap-4">
                         <div className="text-center p-3 bg-white/10 rounded-xl backdrop-blur-sm">
                             <p className="text-3xl font-bold">{weekVisits.length}</p>
-                            <p className="text-xs text-emerald-200">Visits Completed</p>
+                            <p className="text-xs text-primary-200">Visits Completed</p>
                         </div>
                         <div className="text-center p-3 bg-white/10 rounded-xl backdrop-blur-sm">
                             <p className="text-3xl font-bold">{weeklyCompletionRate}%</p>
-                            <p className="text-xs text-emerald-200">Effective Rate</p>
+                            <p className="text-xs text-primary-200">Effective Rate</p>
                         </div>
                         <div className="text-center p-3 bg-white/10 rounded-xl backdrop-blur-sm">
                             <p className="text-3xl font-bold">{doneTasks}</p>
-                            <p className="text-xs text-emerald-200">Tasks Done</p>
+                            <p className="text-xs text-primary-200">Tasks Done</p>
                         </div>
                     </div>
                 </div>
@@ -124,23 +126,22 @@ const Analytics = () => {
                 {/* Weekly Visits Chart */}
                 <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-5">
                     <div className="flex items-center gap-2 mb-4">
-                        <BarChart3 className="text-emerald-600" />
-                        <h3 className="font-bold dark:text-white">Visits This Week</h3>
+                        <div className="bg-primary-50 dark:bg-primary-900/20 p-2 rounded-lg">
+                            <TrendingUp className="text-primary-600 dark:text-primary-400" size={20} />
+                        </div>
+                        <span className="text-sm font-bold dark:text-slate-400">Weekly Performance</span>
                     </div>
-                    <div className="h-48">
+                    <div className="h-[300px] w-full mt-4">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={weeklyChartData}>
-                                <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#94a3b8" />
-                                <YAxis allowDecimals={false} tick={{ fontSize: 12 }} stroke="#94a3b8" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
+                                <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
                                 <Tooltip
-                                    contentStyle={{
-                                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        color: '#fff'
-                                    }}
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    cursor={{ fill: '#F1F5F9' }}
                                 />
-                                <Bar dataKey="visits" fill="#10b981" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="visits" fill="#4F46E5" radius={[4, 4, 0, 0]} barSize={40} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -151,10 +152,12 @@ const Analytics = () => {
                     {/* Store Health Pie */}
                     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-5">
                         <div className="flex items-center gap-2 mb-4">
-                            <Store className="text-emerald-600" />
-                            <h3 className="font-bold dark:text-white">Store Health</h3>
+                            <div className="bg-primary-50 dark:bg-primary-900/20 p-2 rounded-lg">
+                                <PieChartIcon className="text-primary-600 dark:text-primary-400" size={20} />
+                            </div>
+                            <span className="text-sm font-bold dark:text-slate-400">Store Health Status</span>
                         </div>
-                        <div className="h-40">
+                        <div className="h-[300px] w-full mt-4">
                             {storeHealthData.length > 0 ? (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
@@ -162,16 +165,18 @@ const Analytics = () => {
                                             data={storeHealthData}
                                             cx="50%"
                                             cy="50%"
-                                            innerRadius={40}
-                                            outerRadius={60}
-                                            paddingAngle={2}
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
                                             dataKey="value"
                                         >
-                                            {storeHealthData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
+                                            <Cell fill="#4F46E5" />
+                                            <Cell fill="#F59E0B" />
+                                            <Cell fill="#EF4444" />
                                         </Pie>
-                                        <Tooltip />
+                                        <Tooltip
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                        />
                                     </PieChart>
                                 </ResponsiveContainer>
                             ) : (
@@ -191,7 +196,7 @@ const Analytics = () => {
                     {/* Tasks Pie */}
                     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-5">
                         <div className="flex items-center gap-2 mb-4">
-                            <CheckSquare className="text-teal-600" />
+                            <CheckSquare className="text-primary-600" />
                             <h3 className="font-bold dark:text-white">Tasks Status</h3>
                         </div>
                         <div className="h-40">
@@ -232,7 +237,7 @@ const Analytics = () => {
                 {/* Store Health Overview */}
                 <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-5">
                     <div className="flex items-center gap-2 mb-4">
-                        <Store className="text-emerald-600" />
+                        <Store className="text-primary-600" />
                         <h3 className="font-bold dark:text-white">Store Health</h3>
                         <span className="ml-auto text-sm text-slate-500">{stores.length} Total</span>
                     </div>
@@ -307,9 +312,9 @@ const Analytics = () => {
                             <p className="text-xs text-blue-700 dark:text-blue-400 mb-1">⏳ In Progress</p>
                             <p className="text-2xl font-bold text-blue-600">{inProgressTasks}</p>
                         </div>
-                        <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl text-center">
-                            <p className="text-xs text-emerald-700 dark:text-emerald-400 mb-1">✅ Done</p>
-                            <p className="text-2xl font-bold text-emerald-600">{doneTasks}</p>
+                        <div className="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-xl text-center">
+                            <p className="text-xs text-primary-700 dark:text-primary-400 mb-1">✅ Done</p>
+                            <p className="text-2xl font-bold text-primary-600">{doneTasks}</p>
                         </div>
                     </div>
                 </div>
@@ -327,8 +332,8 @@ const Analytics = () => {
                             <p className="text-3xl font-bold text-purple-600">{scheduledVisits}</p>
                         </div>
                         <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl text-center">
-                            <p className="text-xs text-emerald-700 dark:text-emerald-400 mb-1">✅ Completed</p>
-                            <p className="text-3xl font-bold text-emerald-600">{completedVisits}</p>
+                            <p className="text-xs text-primary-700 dark:text-primary-400 mb-1">✅ Completed</p>
+                            <p className="text-3xl font-bold text-primary-600">{completedVisits}</p>
                         </div>
                     </div>
                 </div>
@@ -343,11 +348,11 @@ const Analytics = () => {
                     <div className="grid grid-cols-2 gap-3">
                         <div className="p-4 border dark:border-slate-700 rounded-xl text-center">
                             <p className="text-xs text-slate-500 mb-1">Visits Completed</p>
-                            <p className="text-3xl font-bold text-emerald-600">{monthVisits}</p>
+                            <p className="text-3xl font-bold text-primary-600">{monthVisits}</p>
                         </div>
                         <div className="p-4 border dark:border-slate-700 rounded-xl text-center">
                             <p className="text-xs text-slate-500 mb-1">Tasks Completed</p>
-                            <p className="text-3xl font-bold text-teal-600">{monthTasks}</p>
+                            <p className="text-3xl font-bold text-primary-600">{monthTasks}</p>
                         </div>
                     </div>
                 </div>

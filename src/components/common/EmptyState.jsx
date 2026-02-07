@@ -15,7 +15,7 @@ const illustrations = {
 };
 
 const colorClasses = {
-    emerald: 'from-emerald-100 to-emerald-200 dark:from-emerald-900/40 dark:to-emerald-800/30 text-emerald-600 dark:text-emerald-400',
+    emerald: 'from-primary-100 to-primary-200 dark:from-primary-900/40 dark:to-primary-800/30 text-primary-600 dark:text-primary-400',
     amber: 'from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-800/30 text-amber-600 dark:text-amber-400',
     blue: 'from-blue-100 to-blue-200 dark:from-blue-900/40 dark:to-blue-800/30 text-blue-600 dark:text-blue-400',
     teal: 'from-teal-100 to-teal-200 dark:from-teal-900/40 dark:to-teal-800/30 text-teal-600 dark:text-teal-400',
@@ -47,7 +47,7 @@ const EmptyState = ({
                     {description || 'لا توجد بيانات'}
                 </p>
                 {action && (
-                    <button onClick={action} className="mt-3 text-sm text-emerald-600 hover:underline">
+                    <button onClick={action} className="mt-3 text-sm text-primary-600 hover:underline">
                         {actionLabel || 'إضافة جديد'}
                     </button>
                 )}
@@ -87,7 +87,7 @@ const EmptyState = ({
             {action && (
                 <button
                     onClick={action}
-                    className="group px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/40 hover:-translate-y-1 flex items-center gap-2"
+                    className="group px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-primary-500/40 hover:-translate-y-1 flex items-center gap-2"
                 >
                     <span className="text-xl group-hover:scale-110 transition-transform">+</span>
                     {actionLabel || 'إضافة جديد'}

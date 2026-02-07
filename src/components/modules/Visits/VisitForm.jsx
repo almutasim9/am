@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { AlertCircle, Calendar, Clock } from 'lucide-react';
+import { AlertCircle, Calendar, Clock, Save } from 'lucide-react';
 import useTranslation from '../../../hooks/useTranslation';
 import { LangContext } from '../../../contexts/AppContext';
 import { safeValidate, visitSchema } from '../../../utils/validation';
@@ -33,8 +33,9 @@ const VisitForm = ({ visit, stores, settings, onSave, onCancel }) => {
     const setQuickDate = (days) => {
         const d = new Date();
         d.setDate(d.getDate() + days);
-        setForm({ ...form, date: d.toISOString() });
-        if (errors.date) setErrors({ ...errors, date: null });
+        const value = d.toISOString();
+        setForm(prev => ({ ...prev, date: value }));
+        if (errors.date) setErrors(prev => ({ ...prev, date: null }));
     };
 
     const handleSubmit = async () => {
@@ -55,9 +56,9 @@ const VisitForm = ({ visit, stores, settings, onSave, onCancel }) => {
     };
 
     const handleFieldChange = (field, value) => {
-        setForm({ ...form, [field]: value });
+        setForm(prev => ({ ...prev, [field]: value }));
         if (errors[field]) {
-            setErrors({ ...errors, [field]: null });
+            setErrors(prev => ({ ...prev, [field]: null }));
         }
     };
 
@@ -173,14 +174,10 @@ const VisitForm = ({ visit, stores, settings, onSave, onCancel }) => {
                 <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95"
                 >
-                    {isSubmitting ? (
-                        <>
-                            <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-                            Saving...
-                        </>
-                    ) : t('save')}
+                    {isSubmitting ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <Save size={20} />}
+                    Schedule Visit
                 </button>
                 <button
                     onClick={onCancel}

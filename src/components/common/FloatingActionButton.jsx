@@ -18,7 +18,7 @@ const FloatingActionButton = ({ onNewVisit, onNewTask }) => {
             {/* Main Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`pointer-events-auto p-4 rounded-full shadow-lg text-white transition-all duration-300 ${isOpen ? 'bg-red-500 rotate-90' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                className={`pointer-events-auto p-4 rounded-full shadow-lg text-white transition-all duration-300 ${isOpen ? 'bg-red-500 rotate-90' : 'bg-primary-600 hover:bg-primary-700'}`}
             >
                 {isOpen ? <X size={24} /> : <Plus size={24} />}
             </button>
@@ -43,7 +43,7 @@ const FloatingActionButton = ({ onNewVisit, onNewTask }) => {
                     className={`flex items-center gap-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-transform ${isRTL ? 'hover:translate-x-1 flex-row-reverse' : 'hover:-translate-x-1'}`}
                 >
                     <span className="text-sm font-medium">{t('newVisit')}</span>
-                    <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full">
+                    <div className="p-2 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full">
                         <Calendar size={20} />
                     </div>
                 </button>

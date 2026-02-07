@@ -26,7 +26,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
             {/* Header */}
             <div className="p-6">
                 <div className="flex items-center gap-3 px-2">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
+                    <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25">
                         <Store size={20} className="text-white" aria-hidden="true" />
                     </div>
                     <div>
@@ -43,15 +43,15 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
                         onClick={() => setIsMobileOpen(false)}
                         aria-label={`Navigate to ${item.label}`}
                         className={({ isActive }) => `w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 relative overflow-hidden group outline-none ${isActive
-                            ? 'bg-primary-600/10 text-primary-700 dark:text-primary-300 font-bold'
-                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+                            ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-bold'
+                            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
                             }`}
                     >
                         {({ isActive }) => (
                             <>
-                                <div className={`absolute inset-0 bg-gradient-to-r from-primary-500/10 to-transparent opacity-0 transition-opacity duration-300 ${isActive ? 'opacity-100' : 'group-hover:opacity-50'}`} />
-                                {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary-600 rounded-r-full" />}
-                                <item.icon size={20} className={`relative z-10 transition-colors ${isActive ? 'text-primary-600 dark:text-primary-400' : 'group-hover:text-primary-500'}`} aria-hidden="true" />
+                                <div className={`absolute inset-0 bg-gradient-to-r from-primary-500/5 to-transparent opacity-0 transition-opacity duration-300 ${isActive ? 'opacity-100' : 'group-hover:opacity-50'}`} />
+                                {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary-500 rounded-r-full" />}
+                                <item.icon size={20} className={`relative z-10 transition-colors ${isActive ? 'text-primary-600 dark:text-primary-400' : 'group-hover:text-primary-600'}`} aria-hidden="true" />
                                 <span className="relative z-10">{item.label}</span>
                             </>
                         )}
@@ -62,7 +62,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
                 <button
                     onClick={() => setDark(!dark)}
                     aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-3 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors dark:text-white min-h-[48px] active:bg-slate-300 dark:active:bg-slate-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full flex items-center justify-center gap-2 px-3 py-3 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors dark:text-white min-h-[48px] active:bg-slate-300 dark:active:bg-slate-500 focus:ring-2 focus:ring-primary-500 focus:outline-none"
                 >
                     {dark ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
                     <span className="text-sm">{dark ? 'Light Mode' : 'Dark Mode'}</span>

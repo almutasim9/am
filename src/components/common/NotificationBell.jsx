@@ -91,7 +91,7 @@ const NotificationBell = ({ tasks, visits, stores = [] }) => {
             return <BellRing size={20} className="text-red-500 animate-pulse" />;
         }
         if (notificationPermission === 'granted') {
-            return <Bell size={20} className="text-emerald-500" />;
+            return <Bell size={20} className="text-primary-500" />;
         }
         return <BellOff size={20} className="text-slate-400" />;
     };
@@ -215,7 +215,7 @@ const NotificationBell = ({ tasks, visits, stores = [] }) => {
                             {/* Empty State */}
                             {totalOverdue === 0 && totalToday === 0 && (
                                 <div className="p-6 text-center">
-                                    <CheckCircle size={32} className="mx-auto text-emerald-500 mb-2" />
+                                    <CheckCircle size={32} className="mx-auto text-primary-500 mb-2" />
                                     <p className="text-sm text-slate-500 dark:text-slate-400">لا توجد تنبيهات</p>
                                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">أنت على المسار الصحيح! 🎯</p>
                                 </div>
@@ -226,7 +226,7 @@ const NotificationBell = ({ tasks, visits, stores = [] }) => {
                         <div className="p-2 border-t dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
                             <p className="text-xs text-center text-slate-400 flex items-center justify-center gap-1">
                                 {notificationPermission === 'granted' ? (
-                                    <><Bell size={10} className="text-emerald-500" /> الإشعارات مفعّلة</>
+                                    <><Bell size={10} className="text-primary-500" /> الإشعارات مفعّلة</>
                                 ) : (
                                     <><BellOff size={10} /> الإشعارات غير مفعّلة</>
                                 )}

@@ -36,7 +36,7 @@ const Breadcrumbs = ({ customItems = [] }) => {
                 <li>
                     <Link
                         to="/"
-                        className="flex items-center gap-1.5 px-2 py-1 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        className="flex items-center gap-1.5 px-2 py-1 text-slate-500 hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     >
                         <Home size={14} />
                         <span className="hidden sm:inline">Home</span>
@@ -62,7 +62,7 @@ const Breadcrumbs = ({ customItems = [] }) => {
                                 // Link to previous page
                                 <Link
                                     to={item.to}
-                                    className="flex items-center gap-1.5 px-2 py-1 text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                    className="flex items-center gap-1.5 px-2 py-1 text-slate-500 hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 >
                                     <span className="text-base">{item.icon}</span>
                                     {item.label}

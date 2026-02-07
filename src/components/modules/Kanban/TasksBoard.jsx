@@ -101,7 +101,7 @@ const TasksBoard = () => {
     const columns = [
         { id: 'pending', title: 'Pending', icon: '📋', bgColor: 'bg-amber-50 dark:bg-amber-900/10', borderColor: 'border-amber-300' },
         { id: 'in_progress', title: 'In Progress', icon: '⏳', bgColor: 'bg-blue-50 dark:bg-blue-900/10', borderColor: 'border-blue-300' },
-        { id: 'done', title: 'Done', icon: '✅', bgColor: 'bg-emerald-50 dark:bg-emerald-900/10', borderColor: 'border-emerald-300' }
+        { id: 'done', title: 'Done', icon: '✅', bgColor: 'bg-indigo-50/50 dark:bg-indigo-900/10', borderColor: 'border-primary-200' }
     ];
 
     // Helper: Filter by Time (Today/Week)
@@ -317,15 +317,15 @@ const TasksBoard = () => {
                         {/* Quick Filters */}
                         <div className="flex bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
                             <button onClick={() => setQuickFilter('all')}
-                                className={`px-3 py-2 rounded-md text-sm transition-colors ${quickFilter === 'all' ? 'bg-white dark:bg-slate-600 shadow-sm text-emerald-600 font-bold' : 'text-slate-500 hover:text-slate-700'}`}>
+                                className={`px-3 py-2 rounded-md text-sm transition-colors ${quickFilter === 'all' ? 'bg-white dark:bg-slate-600 shadow-sm text-primary-600 font-bold' : 'text-slate-500 hover:text-slate-700'}`}>
                                 All Time
                             </button>
                             <button onClick={() => setQuickFilter('today')}
-                                className={`px-3 py-2 rounded-md text-sm transition-colors ${quickFilter === 'today' ? 'bg-white dark:bg-slate-600 shadow-sm text-emerald-600 font-bold' : 'text-slate-500 hover:text-slate-700'}`}>
+                                className={`px-3 py-2 rounded-md text-sm transition-colors ${quickFilter === 'today' ? 'bg-white dark:bg-slate-600 shadow-sm text-primary-600 font-bold' : 'text-slate-500 hover:text-slate-700'}`}>
                                 Today
                             </button>
                             <button onClick={() => setQuickFilter('week')}
-                                className={`px-3 py-2 rounded-md text-sm transition-colors ${quickFilter === 'week' ? 'bg-white dark:bg-slate-600 shadow-sm text-emerald-600 font-bold' : 'text-slate-500 hover:text-slate-700'}`}>
+                                className={`px-3 py-2 rounded-md text-sm transition-colors ${quickFilter === 'week' ? 'bg-white dark:bg-slate-600 shadow-sm text-primary-600 font-bold' : 'text-slate-500 hover:text-slate-700'}`}>
                                 This Week
                             </button>
                         </div>
@@ -333,21 +333,21 @@ const TasksBoard = () => {
                         {/* View Toggle */}
                         <div className="flex bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
                             <button onClick={() => setViewMode('board')}
-                                className={`px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-1 min-h-[40px] ${viewMode === 'board' ? 'bg-white dark:bg-slate-600 shadow-sm text-emerald-600 font-medium' : 'text-slate-500 hover:text-slate-700'}`}>
+                                className={`px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-1 min-h-[40px] ${viewMode === 'board' ? 'bg-white dark:bg-slate-600 shadow-sm text-primary-600 font-medium' : 'text-slate-500 hover:text-slate-700'}`}>
                                 🗂️ Board
                             </button>
                             <button onClick={() => setViewMode('list')}
-                                className={`px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-1 min-h-[40px] ${viewMode === 'list' ? 'bg-white dark:bg-slate-600 shadow-sm text-emerald-600 font-medium' : 'text-slate-500 hover:text-slate-700'}`}>
+                                className={`px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-1 min-h-[40px] ${viewMode === 'list' ? 'bg-white dark:bg-slate-600 shadow-sm text-primary-600 font-medium' : 'text-slate-500 hover:text-slate-700'}`}>
                                 📋 List
                             </button>
                             <button onClick={() => setViewMode('calendar')}
-                                className={`px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-1 min-h-[40px] ${viewMode === 'calendar' ? 'bg-white dark:bg-slate-600 shadow-sm text-emerald-600 font-medium' : 'text-slate-500 hover:text-slate-700'}`}>
+                                className={`px-3 py-2 rounded-md text-sm transition-colors flex items-center gap-1 min-h-[40px] ${viewMode === 'calendar' ? 'bg-white dark:bg-slate-600 shadow-sm text-primary-600 font-medium' : 'text-slate-500 hover:text-slate-700'}`}>
                                 📅 <span className="hidden sm:inline">Calendar</span>
                             </button>
                         </div>
 
                         <button onClick={() => { setEditTask(null); setShowModal(true); }}
-                            className="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-purple-700 text-white rounded-xl transition-all shadow-lg shadow-emerald-500/25 min-h-[44px] active:scale-[0.98]">
+                            className="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-all shadow-lg shadow-primary-500/25 min-h-[44px] active:scale-[0.98] font-bold">
                             <Plus size={20} /><span className="hidden sm:inline">{t('newTask')}</span><span className="sm:hidden">Add</span>
                         </button>
                     </div>
@@ -391,10 +391,11 @@ const TasksBoard = () => {
                     <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-                                <TrendingUp size={20} className="text-emerald-600" />
+                                <TrendingUp size={20} className="text-primary-600" />
                             </div>
                             <div>
-                                <p className="text-2xl font-bold text-emerald-600">{stats.done}</p>
+                                <h4 className="text-[10px] uppercase font-black text-slate-400 dark:text-slate-500 tracking-[0.2em]">Finished</h4>
+                                <p className="text-2xl font-bold text-primary-600">{stats.done}</p>
                                 <p className="text-xs text-slate-500">Completed</p>
                             </div>
                         </div>
@@ -403,14 +404,14 @@ const TasksBoard = () => {
 
                 {/* Search and Export Bar */}
                 <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative flex-1">
-                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <div className="relative group w-full md:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" size={18} />
                         <input
                             type="text"
                             placeholder="Search tasks by name, category, or store..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 border rounded-xl dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border-none rounded-xl dark:text-white focus:ring-2 focus:ring-primary-500 outline-none transition-all font-medium"
                         />
                         {searchQuery && (
                             <button
@@ -442,7 +443,7 @@ const TasksBoard = () => {
                                     onDragOver={(e) => handleDragOver(e, column.id)}
                                     onDragLeave={handleDragLeave}
                                     onDrop={(e) => handleDrop(e, column.id)}
-                                    className={`rounded-2xl p-4 transition-colors min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink ${column.bgColor} ${isDragOver ? 'ring-2 ring-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : ''}`}>
+                                    className={`rounded-2xl p-4 transition-colors min-w-[280px] md:min-w-0 snap-center flex-shrink-0 md:flex-shrink ${column.bgColor} ${isDragOver ? 'ring-2 ring-primary-500 bg-primary-50 dark:bg-primary-900/30' : ''}`}>
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-2">
                                             <span className="text-xl">{column.icon}</span>
@@ -499,7 +500,7 @@ const TasksBoard = () => {
                         <div className="flex flex-wrap gap-2">
                             {['all', 'pending', 'in_progress', 'done'].map(status => (
                                 <button key={status} onClick={() => setListFilter(status)}
-                                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${listFilter === status ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 font-medium' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'}`}>
+                                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${listFilter === status ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 font-bold' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'}`}>
                                     {status === 'all' ? `All (${tasks.length})` :
                                         status === 'pending' ? `📋 Pending` :
                                             status === 'in_progress' ? `⏳ In Progress` :
@@ -560,7 +561,7 @@ const TasksBoard = () => {
                                             <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                                                 {task.status !== 'done' && (
                                                     <button onClick={() => handleStatusChange(task, 'done')} title="Complete"
-                                                        className="p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center">
+                                                        className="p-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center">
                                                         <CheckCircle size={16} />
                                                     </button>
                                                 )}
@@ -590,7 +591,7 @@ const TasksBoard = () => {
                 {viewMode === 'calendar' && (
                     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden">
                         {/* Calendar Header */}
-                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
                             <button onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
                                 className="p-2 hover:bg-white/20 rounded-lg transition-colors">
                                 <ChevronRight size={20} className="rotate-180" />
@@ -617,10 +618,10 @@ const TasksBoard = () => {
 
                                 return (
                                     <div key={idx} onClick={() => day && setSelectedDate(day)}
-                                        className={`min-h-[100px] p-1 bg-white dark:bg-slate-800 ${day ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50' : ''} ${isToday ? 'ring-2 ring-emerald-500 ring-inset bg-emerald-50/30' : ''}`}>
+                                        className={`min-h-[100px] p-1 bg-white dark:bg-slate-800 ${day ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50' : ''} ${isToday ? 'ring-2 ring-primary-500 ring-inset bg-primary-50/30' : ''}`}>
                                         {day && (
                                             <>
-                                                <div className={`text-sm font-medium mb-1 ${isToday ? 'text-emerald-600 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>
+                                                <div className={`text-sm font-medium mb-1 ${isToday ? 'text-primary-600 font-bold' : 'text-slate-600 dark:text-slate-300'}`}>
                                                     {day.getDate()}
                                                 </div>
                                                 <div className="space-y-1">
@@ -686,12 +687,12 @@ const TasksBoard = () => {
                             <div className="flex gap-2 pt-4 border-t dark:border-slate-700">
                                 {viewTask.status !== 'done' && (
                                     <button onClick={() => { handleStatusChange(viewTask, 'done'); setViewTask(null); }}
-                                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl transition-colors">
+                                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary-500 hover:bg-primary-600 text-white rounded-xl transition-colors">
                                         <CheckCircle size={18} /> Complete
                                     </button>
                                 )}
                                 <button onClick={() => { setEditTask(viewTask); setShowModal(true); setViewTask(null); }}
-                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl transition-colors">
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl transition-colors font-bold shadow-lg shadow-primary-500/20 active:scale-95">
                                     <Edit2 size={18} />{t('edit')}
                                 </button>
                                 <button onClick={() => setConfirmDelete(viewTask.id)}
@@ -722,7 +723,7 @@ const TasksBoard = () => {
                                         </div>
                                         {task.status !== 'done' && (
                                             <div className="flex gap-2 mt-3">
-                                                <button onClick={() => { handleStatusChange(task, 'done'); setSelectedDate(null); }} className="flex-1 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm">Complete</button>
+                                                <button onClick={() => { handleStatusChange(task, 'done'); setSelectedDate(null); }} className="flex-1 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm">Complete</button>
                                                 <button onClick={() => { setEditTask(task); setShowModal(true); setSelectedDate(null); }} className="py-2 px-3 bg-slate-200 hover:bg-slate-300 rounded-lg text-sm"><Edit2 size={16} /></button>
                                             </div>
                                         )}
