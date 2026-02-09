@@ -1,19 +1,36 @@
 import React, { useState } from 'react';
-import { CheckCircle, AlertTriangle, Star, MessageSquare } from 'lucide-react';
+import { safeValidate, completeVisitSchema } from '../../../utils/validation';
+import { AlertCircle, CheckCircle, AlertTriangle, Star, MessageSquare } from 'lucide-react';
 import useTranslation from '../../../hooks/useTranslation';
 
 const CompleteVisitForm = ({ visit, onComplete, onCancel }) => {
     const t = useTranslation();
-    const [isEffective, setIsEffective] = useState(true);
-    const [createFollowUp, setCreateFollowUp] = useState(false);
-    const [rating, setRating] = useState(0);
-    const [notes, setNotes] = useState('');
+    const [form, setForm] = useState({
+        isEffective: true,
+        createFollowUp: false,
+        rating: 0,
+        notes: ''
+    });
+    const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const handleFieldChange = (field, value) => {
+        setForm(prev => ({ ...prev, [field]: value }));
+        if (errors[field]) {
+            setErrors(prev => ({ ...prev, [field]: null }));
+        }
+    };
+
     const handleComplete = async () => {
+        const validation = safeValidate(completeVisitSchema, form);
+        if (!validation.success) {
+            setErrors(validation.errors);
+            return;
+        }
+
         setIsSubmitting(true);
         try {
-            await onComplete(visit, isEffective, createFollowUp, { rating, notes });
+            await onComplete(visit, form.isEffective, form.createFollowUp, { rating: form.rating, notes: form.notes });
         } finally {
             setIsSubmitting(false);
         }
@@ -26,14 +43,14 @@ const CompleteVisitForm = ({ visit, onComplete, onCancel }) => {
                 <label className="flex items-center gap-3 cursor-pointer">
                     <input
                         type="checkbox"
-                        checked={isEffective}
-                        onChange={e => setIsEffective(e.target.checked)}
+                        checked={form.isEffective}
+                        onChange={e => handleFieldChange('isEffective', e.target.checked)}
                         className="w-5 h-5 rounded accent-emerald-600"
                     />
                     <span className="dark:text-white font-medium">{t('isEffective')}</span>
                 </label>
-                <div className={`mt-2 flex items-center gap-2 text-sm ${isEffective ? 'text-emerald-600' : 'text-amber-600'}`}>
-                    {isEffective ? (
+                <div className={`mt-2 flex items-center gap-2 text-sm ${form.isEffective ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    {form.isEffective ? (
                         <>
                             <CheckCircle size={16} />
                             <span>Store health will be updated</span>
@@ -48,46 +65,51 @@ const CompleteVisitForm = ({ visit, onComplete, onCancel }) => {
             </div>
 
             {/* Rating */}
-            <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl">
-                <label className="block text-sm font-medium dark:text-slate-300 mb-2">
-                    Visit Rating
+            <div className={`p-4 rounded-xl transition-all ${errors.rating ? 'bg-red-50 dark:bg-red-900/10 ring-1 ring-red-500' : 'bg-slate-50 dark:bg-slate-700'}`}>
+                <label className="block text-sm font-medium dark:text-slate-300 mb-2 flex items-center gap-2">
+                    Visit Rating <span className="text-red-500">*</span>
+                    {errors.rating && <AlertCircle size={14} className="text-red-500 animate-pulse" />}
                 </label>
                 <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map(star => (
                         <button
                             key={star}
                             type="button"
-                            onClick={() => setRating(star)}
-                            className={`p-1 transition-colors ${star <= rating ? 'text-amber-400' : 'text-slate-300 dark:text-slate-600'
+                            onClick={() => handleFieldChange('rating', star)}
+                            className={`p-1 transition-colors ${star <= form.rating ? 'text-amber-400' : 'text-slate-300 dark:text-slate-600'
                                 } hover:text-amber-400`}
                         >
-                            <Star size={28} fill={star <= rating ? 'currentColor' : 'none'} />
+                            <Star size={28} fill={star <= form.rating ? 'currentColor' : 'none'} />
                         </button>
                     ))}
                 </div>
-                {rating > 0 && (
+                {errors.rating ? (
+                    <p className="text-red-500 text-xs mt-2 font-bold">{errors.rating}</p>
+                ) : form.rating > 0 && (
                     <p className="text-sm text-slate-500 mt-1">
-                        {rating === 5 ? 'Excellent!' :
-                            rating >= 4 ? 'Very Good' :
-                                rating >= 3 ? 'Good' :
-                                    rating >= 2 ? 'Fair' : 'Poor'}
+                        {form.rating === 5 ? 'Excellent!' :
+                            form.rating >= 4 ? 'Very Good' :
+                                form.rating >= 3 ? 'Good' :
+                                    form.rating >= 2 ? 'Fair' : 'Poor'}
                     </p>
                 )}
             </div>
 
             {/* Completion Notes */}
-            <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl">
+            <div className={`p-4 rounded-xl transition-all ${errors.notes ? 'bg-red-50 dark:bg-red-900/10 ring-1 ring-red-500' : 'bg-slate-50 dark:bg-slate-700'}`}>
                 <label className="flex items-center gap-2 text-sm font-medium dark:text-slate-300 mb-2">
                     <MessageSquare size={16} />
-                    Completion Notes
+                    Completion Notes <span className="text-red-500">*</span>
+                    {errors.notes && <AlertCircle size={14} className="text-red-500 animate-pulse" />}
                 </label>
                 <textarea
-                    value={notes}
-                    onChange={e => setNotes(e.target.value)}
+                    value={form.notes}
+                    onChange={e => handleFieldChange('notes', e.target.value)}
                     rows={2}
-                    placeholder="What happened during the visit?"
-                    className="w-full px-3 py-2 border rounded-lg dark:bg-slate-600 dark:border-slate-500 dark:text-white text-sm resize-none"
+                    placeholder="What happened during the visit? (min 5 characters)"
+                    className={`w-full px-3 py-2 border rounded-lg dark:bg-slate-600 dark:border-slate-500 dark:text-white text-sm resize-none transition-all ${errors.notes ? 'border-red-500 focus:ring-red-500' : 'focus:ring-primary-500'}`}
                 />
+                {errors.notes && <p className="text-red-500 text-xs mt-1 font-bold">{errors.notes}</p>}
             </div>
 
             {/* Create Follow-up */}
@@ -95,8 +117,8 @@ const CompleteVisitForm = ({ visit, onComplete, onCancel }) => {
                 <label className="flex items-center gap-3 cursor-pointer">
                     <input
                         type="checkbox"
-                        checked={createFollowUp}
-                        onChange={e => setCreateFollowUp(e.target.checked)}
+                        checked={form.createFollowUp}
+                        onChange={e => handleFieldChange('createFollowUp', e.target.checked)}
                         className="w-5 h-5 rounded accent-teal-600"
                     />
                     <div>

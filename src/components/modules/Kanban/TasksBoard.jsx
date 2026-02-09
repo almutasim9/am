@@ -276,31 +276,60 @@ const TasksBoard = () => {
 
     const handleDeleteConfirm = async () => {
         if (!confirmDelete) return;
-        // Optimistic update
-        if (setTasks) {
-            setTasks(tasks.filter(t => t.id !== confirmDelete));
-        }
 
-        const table = await db.from('tasks');
-        await table.delete(confirmDelete);
-        showToast(t('deletedSuccess'), 'success');
-        setConfirmDelete(null);
-        setViewTask(null);
-        onRefresh();
+        try {
+            // Optimistic update
+            if (setTasks) {
+                setTasks(tasks.filter(t => t.id !== confirmDelete));
+            }
+
+            const table = await db.from('tasks');
+            const { error } = await table.delete(confirmDelete);
+
+            if (error) {
+                // Revert optimistic update on error
+                onRefresh();
+                showToast(error.userMessage || 'Error deleting task', 'error');
+                return;
+            }
+
+            showToast(t('deletedSuccess'), 'success');
+            setConfirmDelete(null);
+            setViewTask(null);
+            onRefresh();
+        } catch (err) {
+            console.error('handleDeleteConfirm error:', err);
+            showToast('Unexpected error deleting task', 'error');
+            onRefresh();
+        }
     };
 
     const handleStatusChange = async (task, newStatus) => {
-        // Optimistic Update
-        if (setTasks) {
-            const updated = tasks.map(t => t.id === task.id ? { ...t, status: newStatus } : t);
-            setTasks(updated);
-        }
+        try {
+            // Optimistic Update
+            if (setTasks) {
+                const updated = tasks.map(t => t.id === task.id ? { ...t, status: newStatus } : t);
+                setTasks(updated);
+            }
 
-        const table = await db.from('tasks');
-        await table.update(task.id, { status: newStatus });
-        showToast(t('savedSuccess'), 'success');
-        // Silent refresh to ensure consistency
-        onRefresh();
+            const table = await db.from('tasks');
+            const { error } = await table.update(task.id, { status: newStatus });
+
+            if (error) {
+                // Revert optimistic update on error
+                onRefresh();
+                showToast(error.userMessage || 'Error updating task status', 'error');
+                return;
+            }
+
+            showToast(t('savedSuccess'), 'success');
+            // Silent refresh to ensure consistency
+            onRefresh();
+        } catch (err) {
+            console.error('handleStatusChange error:', err);
+            showToast('Unexpected error updating status', 'error');
+            onRefresh();
+        }
     };
 
     return (

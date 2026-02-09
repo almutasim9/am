@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Percent, Plus, Trash2, Store, Tag, Search, Filter, X, Phone, MessageCircle, Edit2, Gift, ExternalLink } from 'lucide-react';
+import { AlertCircle, Plus, Store, Tag, Search, Filter, X, Phone, MessageCircle, Edit2, Gift, ExternalLink } from 'lucide-react';
 import { DataContext } from '../../../contexts/DataContext';
 import { ToastContext } from '../../../contexts/AppContext';
 import useTranslation from '../../../hooks/useTranslation';
@@ -79,13 +79,17 @@ const ActiveOffers = () => {
 
         try {
             const table = await db.from('stores');
-            await table.update(store.id, { offers: newOffers });
+            const { error } = await table.update(store.id, { offers: newOffers });
+            if (error) {
+                showToast(error.userMessage || 'Failed to add offers', 'error');
+                return;
+            }
             showToast(t('savedSuccess'), 'success');
             closeModal();
             refreshData();
         } catch (error) {
             console.error('Error adding offers:', error);
-            showToast('Failed to add offers', 'error');
+            showToast('Unexpected error. Please try again.', 'error');
         }
     };
 

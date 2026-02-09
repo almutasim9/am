@@ -76,7 +76,7 @@ const VisitForm = ({ visit, stores, settings, onSave, onCancel }) => {
                     error={errors.store_id}
                 />
                 {errors.store_id && (
-                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                         <AlertCircle size={12} /> {errors.store_id}
                     </p>
                 )}
@@ -99,7 +99,7 @@ const VisitForm = ({ visit, stores, settings, onSave, onCancel }) => {
                         ))}
                     </select>
                     {errors.type && (
-                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                             <AlertCircle size={12} /> {errors.type}
                         </p>
                     )}
@@ -135,7 +135,7 @@ const VisitForm = ({ visit, stores, settings, onSave, onCancel }) => {
                             }`}
                     />
                     {errors.date && (
-                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                             <AlertCircle size={12} /> {errors.date}
                         </p>
                     )}

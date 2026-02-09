@@ -169,7 +169,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                             className={`w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white font-mono text-lg tracking-widest ${errors.store_code ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
                         />
                         {errors.store_code && (
-                            <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                            <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                                 <AlertCircle size={12} /> {errors.store_code}
                             </p>
                         )}
@@ -190,7 +190,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                                 }`}
                         />
                         {errors.name && (
-                            <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                            <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                                 <AlertCircle size={12} /> {errors.name}
                             </p>
                         )}
@@ -210,7 +210,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                                 {(settings?.storeCategories || []).map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                             {errors.category && (
-                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                                     <AlertCircle size={12} /> {errors.category}
                                 </p>
                             )}
@@ -317,7 +317,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                                     {(settings?.zones || []).map(z => <option key={z} value={z}>{z}</option>)}
                                 </select>
                                 {errors.zone && (
-                                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                                         <AlertCircle size={12} /> {errors.zone}
                                     </p>
                                 )}
@@ -334,7 +334,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                                     className={`w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white ${errors.area_name ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
                                 />
                                 {errors.area_name && (
-                                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                                         <AlertCircle size={12} /> {errors.area_name}
                                     </p>
                                 )}
@@ -352,7 +352,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                                 className={`w-full px-4 py-2 border rounded-xl dark:bg-slate-700 dark:border-slate-600 dark:text-white ${errors.address ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}`}
                             />
                             {errors.address && (
-                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                                     <AlertCircle size={12} /> {errors.address}
                                 </p>
                             )}
@@ -430,7 +430,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                                     }`}
                             />
                             {errors.owner && (
-                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                                     <AlertCircle size={12} /> {errors.owner}
                                 </p>
                             )}
@@ -450,7 +450,7 @@ const StoreForm = ({ store, settings, onSave, onCancel }) => {
                                     }`}
                             />
                             {errors.phone && (
-                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                                     <AlertCircle size={12} /> {errors.phone}
                                 </p>
                             )}

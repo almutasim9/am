@@ -115,7 +115,7 @@ const TaskForm = ({ task, stores, settings, onSave, onCancel }) => {
                     error={errors.store_id}
                 />
                 {errors.store_id && (
-                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                    <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                         <AlertCircle size={12} /> {errors.store_id}
                     </p>
                 )}
@@ -141,7 +141,7 @@ const TaskForm = ({ task, stores, settings, onSave, onCancel }) => {
                         {Object.keys(categories).map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                     {errors.cat && (
-                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                             <AlertCircle size={12} /> {errors.cat}
                         </p>
                     )}
@@ -161,7 +161,7 @@ const TaskForm = ({ task, stores, settings, onSave, onCancel }) => {
                         {(categories[form.cat] || []).map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                     {errors.sub && (
-                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                             <AlertCircle size={12} /> {errors.sub}
                         </p>
                     )}
@@ -202,7 +202,7 @@ const TaskForm = ({ task, stores, settings, onSave, onCancel }) => {
                             }`}
                     />
                     {errors.due_date && (
-                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-bold">
                             <AlertCircle size={12} /> {errors.due_date}
                         </p>
                     )}

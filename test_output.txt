@@ -1,0 +1,79 @@
+
+> am-crm@2.0.0 test:run
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/almutasim_abed/Downloads/AM-CRM-main[39m
+
+ [32m✓[39m src/repositories/VisitRepository.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/repositories/StoreRepository.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/utils/fuzzySearch.test.js [2m([22m[2m9 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+[90mstdout[2m | src/utils/validation.test.js[2m > [22m[2mValidation Utils[2m > [22m[2mstoreSchema[2m > [22m[2mfails if store_code is not 5 digits
+[22m[39mValidation Errors: { store_code: [32m'Store Code must be exactly 5 digits (numbers only)'[39m }
+
+[90mstdout[2m | src/utils/validation.test.js[2m > [22m[2mValidation Utils[2m > [22m[2mstoreSchema[2m > [22m[2mfails if store_code contains non-numeric characters
+[22m[39mValidation Errors: { store_code: [32m'Store Code must be exactly 5 digits (numbers only)'[39m }
+
+[90mstdout[2m | src/utils/validation.test.js[2m > [22m[2mValidation Utils[2m > [22m[2mstoreSchema[2m > [22m[2mfails if required fields are missing
+[22m[39mValidation Errors: {
+  store_code: [32m'Invalid input: expected string, received undefined'[39m,
+  name: [32m'Invalid input: expected string, received undefined'[39m,
+  category: [32m'Invalid input: expected string, received undefined'[39m,
+  zone: [32m'Invalid input: expected string, received undefined'[39m,
+  area_name: [32m'Invalid input: expected string, received undefined'[39m,
+  address: [32m'Invalid input: expected string, received undefined'[39m,
+  owner: [32m'Invalid input: expected string, received undefined'[39m,
+  phone: [32m'Invalid input: expected string, received undefined'[39m
+}
+
+[90mstdout[2m | src/utils/validation.test.js[2m > [22m[2mValidation Utils[2m > [22m[2mtaskSchema[2m > [22m[2mfails if store_id is missing
+[22m[39mValidation Errors: { store_id: [32m'Please select a store'[39m }
+
+[90mstdout[2m | src/utils/validation.test.js[2m > [22m[2mValidation Utils[2m > [22m[2mcontactSchema[2m > [22m[2mfails with invalid phone format
+[22m[39mValidation Errors: { phone: [32m'Invalid phone number format'[39m }
+
+ [31m❯[39m src/utils/validation.test.js [2m([22m[2m11 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 53[2mms[22m[39m
+       [32m✓[39m validates a correct store object[32m 2[2mms[22m[39m
+       [32m✓[39m fails if store_code is not 5 digits[32m 2[2mms[22m[39m
+       [32m✓[39m fails if store_code contains non-numeric characters[32m 1[2mms[22m[39m
+[31m       [31m×[31m fails if required fields are missing[39m[32m 45[2mms[22m[39m
+       [32m✓[39m validates a correct task object[32m 1[2mms[22m[39m
+       [32m✓[39m fails if store_id is missing[32m 0[2mms[22m[39m
+       [32m✓[39m validates a correct visit object[32m 0[2mms[22m[39m
+       [32m✓[39m validates a correct contact object[32m 0[2mms[22m[39m
+       [32m✓[39m fails with invalid phone format[32m 0[2mms[22m[39m
+       [32m✓[39m returns success for valid data[32m 0[2mms[22m[39m
+       [32m✓[39m returns compiled errors for invalid data[32m 0[2mms[22m[39m
+ [32m✓[39m src/hooks/useTranslation.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m src/components/modules/Visits/components/VisitsStats.test.jsx [2m([22m[2m6 tests[22m[2m)[22m[32m 85[2mms[22m[39m
+ [32m✓[39m src/components/modules/Stores/components/StoreCard.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[32m 234[2mms[22m[39m
+ [32m✓[39m src/utils/helpers.test.js [2m([22m[2m7 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m src/services/domain/VisitService.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m src/repositories/TaskRepository.test.js [2m([22m[2m3 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m src/services/domain/StoreService.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m src/services/domain/DashboardService.test.js [2m([22m[2m2 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/utils/validation.test.js[2m > [22mValidation Utils[2m > [22mstoreSchema[2m > [22mfails if required fields are missing
+[31m[1mAssertionError[22m: expected 'Invalid input: expected string, recei…' to be 'Store name must be at least 2 charact…' // Object.is equality[39m
+
+Expected: [32m"Store name must be at least 2 characters"[39m
+Received: [31m"Invalid input: expected string, received undefined"[39m
+
+[36m [2m❯[22m src/utils/validation.test.js:[2m40:40[22m[39m
+    [90m 38| [39m            [35mconst[39m result [33m=[39m [34msafeValidate[39m(storeSchema[33m,[39m {})[33m;[39m
+    [90m 39| [39m            [34mexpect[39m(result[33m.[39msuccess)[33m.[39m[34mtoBe[39m([35mfalse[39m)[33m;[39m
+    [90m 40| [39m            expect(result.errors.name).toBe('Store name must be at lea…
+    [90m   | [39m                                       [31m^[39m
+    [90m 41| [39m            expect(result.errors.category).toBe('Category is required'…
+    [90m 42| [39m        })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (12)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m58 passed[39m[22m[90m (59)[39m
+[2m   Start at [22m 21:48:36
+[2m   Duration [22m 1.95s[2m (transform 623ms, setup 872ms, import 1.35s, tests 491ms, environment 8.01s)[22m
+

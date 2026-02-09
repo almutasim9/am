@@ -65,6 +65,16 @@ export const visitSchema = z.object({
     is_effective: z.boolean().nullable().optional(),
 });
 
+// Visit completion validation schema
+export const completeVisitSchema = z.object({
+    rating: z.number()
+        .min(1, 'Please rate the visit')
+        .max(5),
+    notes: z.string()
+        .min(5, 'Please provide more details about the visit (at least 5 characters)')
+        .max(2000, 'Notes are too long'),
+});
+
 // Contact validation schema
 export const contactSchema = z.object({
     name: z.string()
@@ -83,7 +93,7 @@ export const validate = (schema, data) => {
     } catch (error) {
         if (error instanceof z.ZodError) {
             const errors = {};
-            error.errors.forEach(err => {
+            (error.issues || []).forEach(err => {
                 const path = err.path.join('.');
                 errors[path] = err.message;
             });
@@ -100,9 +110,11 @@ export const safeValidate = (schema, data) => {
         return { success: true, data: result.data, errors: null };
     }
     const errors = {};
-    result.error.errors.forEach(err => {
-        const path = err.path.join('.');
-        errors[path] = err.message;
-    });
+    if (result.error && result.error.issues) {
+        result.error.issues.forEach(err => {
+            const path = err.path.join('.');
+            errors[path] = err.message;
+        });
+    }
     return { success: false, data: null, errors };
 };

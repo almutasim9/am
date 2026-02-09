@@ -117,12 +117,21 @@ const StoresManagement = () => {
 
     const handleDeleteConfirm = async () => {
         if (!confirmDelete) return;
-        const table = await db.from('stores');
-        await table.delete(confirmDelete);
-        showToast(t('deletedSuccess'), 'success');
-        setConfirmDelete(null);
-        onRefresh();
-        refetchInfinite();
+        try {
+            const table = await db.from('stores');
+            const { error } = await table.delete(confirmDelete);
+            if (error) {
+                showToast(error.userMessage || 'Error deleting store', 'error');
+                return;
+            }
+            showToast(t('deletedSuccess'), 'success');
+            setConfirmDelete(null);
+            onRefresh();
+            refetchInfinite();
+        } catch (err) {
+            console.error('handleDeleteConfirm error:', err);
+            showToast('Unexpected error deleting store', 'error');
+        }
     };
 
     const toggleStoreSelection = (storeId) => {
@@ -136,9 +145,27 @@ const StoresManagement = () => {
 
     const handleBulkDelete = async () => {
         if (selectedIds.length === 0) return;
+
         const table = await db.from('stores');
-        for (const id of selectedIds) await table.delete(id);
-        showToast(`Deleted ${selectedIds.length} stores`, 'success');
+        let successCount = 0;
+        let errorCount = 0;
+        let lastError = null;
+
+        for (const id of selectedIds) {
+            const { error } = await table.delete(id);
+            if (!error) successCount++;
+            else {
+                errorCount++;
+                lastError = error;
+            }
+        }
+
+        if (errorCount > 0) {
+            showToast(`Deleted ${successCount} stores. ${errorCount} failed. ${lastError?.userMessage || ''}`, 'warning');
+        } else {
+            showToast(`Successfully deleted ${successCount} stores`, 'success');
+        }
+
         clearSelection();
         setConfirmBulkDelete(false);
         onRefresh();
@@ -191,13 +218,33 @@ const StoresManagement = () => {
         setImportData(prev => ({ ...prev, isLoading: true }));
         try {
             const table = await db.from('stores');
-            for (const store of importData.stores) await table.insert(store);
-            showToast(`${t('importSuccess')} - ${importData.stores.length} stores`, 'success');
+            let successCount = 0;
+            let errorCount = 0;
+            let lastError = null;
+
+            for (const store of importData.stores) {
+                const { error } = await table.insert(store);
+                if (!error) successCount++;
+                else {
+                    errorCount++;
+                    lastError = error;
+                }
+            }
+
+            if (errorCount > 0) {
+                showToast(`Imported ${successCount} stores. ${errorCount} failed. ${lastError?.userMessage || ''}`, 'warning');
+            } else {
+                showToast(`${t('importSuccess')} - ${successCount} stores`, 'success');
+            }
+
             setShowImportModal(false);
             setImportData({ stores: [], duplicates: [], isLoading: false });
             onRefresh();
             refetchInfinite();
-        } catch (error) { showToast('Import failed', 'error'); }
+        } catch (error) {
+            console.error('Import process error:', error);
+            showToast('Import failed due to an unexpected error', 'error');
+        }
     };
 
     const downloadTemplate = () => {

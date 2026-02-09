@@ -142,7 +142,13 @@ const VisitsList = () => {
             if (error) { showToast(error.userMessage || 'Error completing visit.', 'error'); return; }
             if (isEffective) {
                 const storesTable = await db.from('stores');
-                await storesTable.update(visit.store_id, { last_visit: new Date().toISOString() });
+                const { error: storeError } = await storesTable.update(visit.store_id, { last_visit: new Date().toISOString() });
+                if (storeError) {
+                    console.error('Error updating store last_visit:', storeError);
+                    // We don't necessarily want to block the whole process if just the last_visit update fails, 
+                    // but we should probably warn or log it better. 
+                    // For now, let's just proceed but log it.
+                }
             }
             showToast(t('savedSuccess'), 'success');
             setShowComplete(null);
